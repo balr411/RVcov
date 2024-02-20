@@ -40,6 +40,15 @@
 #' @param pLOF_broadMissense TRUE or FALSE. Do you want to perform aggregation
 #'  tests using pLOF + missense(broad) variants only? Default = FALSE.
 #'
+#' @param altGroupFilePath If pLOF, pLOF_narrowMissense, or pLOF_broadMissense
+#'  are TRUE, option to give alternative path to write group files to. Default =
+#'  NULL.
+#'
+#' @param mafThreshold If pLOF, pLOF_narrowMissense, or pLOF_broadMissense
+#'  are TRUE, threshold for including variants in group file. Note here
+#'  we assume that the alternate allele is coded as the minor allele.
+#'  Default = 0.01.
+#'
 #' @param gene The name of the gene to use for annotation files if group files
 #'  are not already supplied. Default = NULL.
 #'
@@ -53,7 +62,9 @@
 agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
                      two_stage = FALSE, two_stage_threshold = 3,
                      group_file = NULL, pLOF = FALSE,
-                     pLOF_narrowMissense = FALSE, pLOF_broadMissense = FALSE){
+                     pLOF_narrowMissense = FALSE, pLOF_broadMissense = FALSE,
+                     altGroupFilePath = NULL, mafThreshold = 0.01,
+                     gene = NULL){
 
   #First read in the necessary columns from the score statistic file
   if(!file.exists(score_stat_file)){
@@ -83,7 +94,8 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
     anno <- fread(cmd = paste0("zgrep -v ^## ", anno_file), header = T, data.table = F)
 
     #Create group files
-    generate_group_file(anno, allele_freq, gene)
+    generate_group_file(anno, allele_freq_test, gene, pLOF, pLOF_narrowMissense,
+                        pLOF_broadMissense, altGroupFilePath, mafThreshold)
 
   }
 
