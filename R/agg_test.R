@@ -40,6 +40,9 @@
 #' @param pLOF_broadMissense TRUE or FALSE. Do you want to perform aggregation
 #'  tests using pLOF + missense(broad) variants only? Default = FALSE.
 #'
+#' @param gene The name of the gene to use for annotation files if group files
+#'  are not already supplied. Default = NULL.
+#'
 #'
 #' @importFrom {data.table} {fread}
 #' @importFrom {stringr} {str_glue}
@@ -70,10 +73,17 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
       stop("Did not give annotation file to create the desired group files.
            If you have supplied your own group files and just want to use those,
            set pLOF, pLOF_narrowMissense, and pLOF_broadMissense to FALSE")
+    }else if(is.null(gene)){
+      stop("You must supply a gene name to create the desired group files.
+           If you have supplied your own group files and just want to use those,
+           please set gene to NULL.")
     }
 
     #Read in annotation file
     anno <- fread(cmd = paste0("zgrep -v ^## ", anno_file), header = T, data.table = F)
+
+    #Create group files
+    generate_group_file(anno, allele_freq, gene)
 
   }
 
