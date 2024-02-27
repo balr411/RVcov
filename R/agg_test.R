@@ -77,8 +77,8 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
   names(allele_freq_test) <- c("CHROM", "POS", "REF", "ALT", "AF", "AC", "PVAL")
 
   #Get group files
-  #Note that if group files are given, they do not need to be read in
-
+  #Return them as a list of data frames in addition to writing the group file to
+  #make it easier to perform the two-stage approach
   if(pLOF | pLOF_narrowMissense | pLOF_broadMissense){
     if(is.null(anno_file)){
       stop("Did not give annotation file to create the desired group files.
@@ -94,9 +94,30 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
     anno <- fread(cmd = paste0("zgrep -v ^## ", anno_file), header = T, data.table = F)
 
     #Create group files
-    generate_group_file(anno, allele_freq_test, gene, pLOF, pLOF_narrowMissense,
-                        pLOF_broadMissense, altGroupFilePath, mafThreshold)
+    mask_list <- generate_group_file(anno, allele_freq_test, gene, pLOF,
+                                     pLOF_narrowMissense, pLOF_broadMissense,
+                                     altGroupFilePath, mafThreshold)
 
+  }else if(is.null(group_file)){
+    stop("Did not specify which group files to use and did not give any of your own")
+  }else{
+    #Initialize mask list to read in user-given group files
+    mask_list <- list()
+  }
+
+  #If group files supplied, read those in  - put this into its own function
+  if(!is.null(group_file)){
+    for(i in 1:length(group_file)){
+      length_curr <- length(mask_list)
+      name_curr <- paste0("userMask", i)
+      mask_curr <- readLines(group_file[i])
+      mask_list[[length_curr + 1]] <- unlist(strsplit(mask_curr, split = "\t", fixed = FALSE))[-1]
+      if(length(mask_list[[length_curr + 1]]) == 0){
+        stop(paste0("Mask ", i, " has no variants. Are you sure your mask is in
+                    RAREMETAL format?"))
+      }
+      names(mask_curr)[length_curr + 1] <- name_curr
+    }
   }
 
 

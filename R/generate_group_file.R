@@ -36,7 +36,7 @@
 #' @importFrom {dplyr} {anti_join}
 #' @importFrom {stringr} {str_count}
 #'
-#' @return Nothing
+#' @return List of data frames containing the SNPs in each mask
 #'
 
 generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
@@ -107,6 +107,9 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
     }
   }
 
+  #List to return to agg_test
+  to_return <- list()
+
   if(pLOF){
     idx_anno_plof <- which(anno$Consequence %in% imp_vars)
     anno_plof <- anno[idx_anno_plof,]
@@ -132,6 +135,9 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
     fileConn <- file(output_plof)
     writeLines(to_write, fileConn)
     close(fileConn)
+
+    #Create data frame to pass back to agg_test
+    to_return$pLOF <- data.frame(snp = mask_list[[1]][-1])
   }
 
   if(pLOF_narrowMissense){
@@ -163,6 +169,9 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
     fileConn <- file(output_narrowMissense)
     writeLines(to_write, fileConn)
     close(fileConn)
+
+    #Create data frame to pass back to agg_test
+    to_return$pLOF_narrowMissense <- data.frame(snp = mask_list[[1]][-1])
   }
 
   if(pLOF_broadMissense){
@@ -194,6 +203,13 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
     fileConn <- file(output_broadMissense)
     writeLines(to_write, fileConn)
     close(fileConn)
+
+    df_plof_broadMissense <- data.frame(snp = mask_list[[1]][-1])
+
+    #Create data frame to pass back to agg_test
+    to_return$pLOF_broadMissense <- data.frame(snp = mask_list[[1]][-1])
   }
+
+  return(to_return)
 
 }
