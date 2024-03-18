@@ -72,9 +72,15 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
   }
 
   allele_freq_test <- fread(cmd = str_glue("zgrep -v ^# {score_stat_file}"),
-                            select = c(1, 2, 3, 4, 7, 8, 17), data.table = FALSE)
+                            select = c(1, 2, 3, 4, 7, 8, 14, 17), data.table = FALSE)
 
-  names(allele_freq_test) <- c("CHROM", "POS", "REF", "ALT", "AF", "AC", "PVAL")
+  names(allele_freq_test) <- c("CHROM", "POS", "REF", "ALT", "AF", "AC",
+                               "U_STAT", "PVAL")
+
+  #Now get residual variance and sample size
+  ss_residual_variance_list <- ss_residual_variance(score_stat_file)
+  n <- as.numeric(ss_residual_variance_list$sampleSize)
+  resid_var <- as.numeric(ss_residual_variance_list$residualVariance)
 
   #Get group files
   #Return them as a list of data frames in addition to writing the group file to
@@ -105,22 +111,18 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
     mask_list <- list()
   }
 
-  #If group files supplied, read those in  - put this into its own function
+  #If group files supplied, read those in
   if(!is.null(group_file)){
-    for(i in 1:length(group_file)){
-      length_curr <- length(mask_list)
-      name_curr <- paste0("userMask", i)
-      mask_curr <- readLines(group_file[i])
-      mask_list[[length_curr + 1]] <- unlist(strsplit(mask_curr, split = "\t", fixed = FALSE))[-1]
-      if(length(mask_list[[length_curr + 1]]) == 0){
-        stop(paste0("Mask ", i, " has no variants. Are you sure your mask is in
-                    RAREMETAL format?"))
-      }
-      names(mask_curr)[length_curr + 1] <- name_curr
-    }
+    mask_list <- c(mask_list, read_user_group_file(group_file))
   }
 
-
+  #Perform two-stage approach if desired
+  if(two_stage){
+    calculate_covariance <- two_stage_test(mask_list, allele_freq_test,
+                                           two_stage_threshold,
+                                           residual_variance = resid_var,
+                                           sample_size = n)
+  }
 
 
 
