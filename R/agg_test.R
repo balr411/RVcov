@@ -13,7 +13,11 @@
 #'
 #' @param vcf_file String containing the file path and name containing the VCF
 #'  of the genotypes of the  set of individuals to be used as the reference
-#'  panel.
+#'  panel. Note that the chromosome column must be in the format c{chr_number}.
+#'  ie. c1 for chromosome 1.
+#'
+#' @param chr The chromosome number on which you want to perform the analysis.
+#' Must be in the format c{chr_number}. ie. c1 for chromosome 1.
 #'
 #' @param anno_file String containing the file path and name containing the
 #'  VEP annotation file to create the group files. If not specified, must give
@@ -42,7 +46,11 @@
 #'
 #' @param altGroupFilePath If pLOF, pLOF_narrowMissense, or pLOF_broadMissense
 #'  are TRUE, option to give alternative path to write group files to. Default =
-#'  NULL.
+#'  NULL. If left as NULL, group files will be written in current directory.
+#'
+#' @param altCovariancePath Option to give alternative path to write covariance
+#' files to. Default = NULL. If left as NULL, covariance files will be written
+#' in current directory.
 #'
 #' @param mafThreshold If pLOF, pLOF_narrowMissense, or pLOF_broadMissense
 #'  are TRUE, threshold for including variants in group file. Note here
@@ -52,6 +60,13 @@
 #' @param gene The name of the gene to use for annotation files if group files
 #'  are not already supplied. Default = NULL.
 #'
+#' @param gene_start The starting base pair position of the gene on the chromosome.
+#' Default = NULL. If you have large reference panel VCFs it is recommended to
+#' supply gene_start and gene_end.
+#'
+#' @param gene_end The ending base pair position of the gene on the chromosome.
+#' Default = NULL. If you have large reference panel VCFs it is recommended to
+#' supply gene_start and gene_end.
 #'
 #' @importFrom {data.table} {fread}
 #' @importFrom {stringr} {str_glue}
@@ -59,12 +74,13 @@
 #' @return A number.
 #' @examples Use examples of data that I simulate
 
-agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
+agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
                      two_stage = FALSE, two_stage_threshold = 3,
                      group_file = NULL, pLOF = FALSE,
                      pLOF_narrowMissense = FALSE, pLOF_broadMissense = FALSE,
-                     altGroupFilePath = NULL, mafThreshold = 0.01,
-                     gene = NULL){
+                     altGroupFilePath = NULL, altCovariancePath = NULL,
+                     mafThreshold = 0.01, gene = NULL, gene_start = NULL,
+                     gene_end = NULL){
 
   #First read in the necessary columns from the score statistic file
   if(!file.exists(score_stat_file)){
@@ -122,9 +138,24 @@ agg_test <- function(score_stat_file, vcf_file, anno_file = NULL,
                                            two_stage_threshold,
                                            residual_variance = resid_var,
                                            sample_size = n)
+  }else{
+    calculate_covariance <- TRUE
   }
 
+  #If necessary, calculate covariance using external reference panel and perform RAREMETAL
+  if(calculate_covariance){
+    #Check that vcf exists
+    if(!exists(vcf_file)){
+      stop("VCF file doesn't exist!")
+    }
 
+    #First create allele frequency data frame for reference panel - note need bcftools installed here
+    allele_freq_ref <- generate_allele_frequency(vcf_file, chr, gene_start, gene_end)
+
+    #Read in VCF file
+    gt <- read_vcf(vcf_file, chr, gene_start, gene_end)
+
+  }
 
 }
 
