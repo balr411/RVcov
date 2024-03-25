@@ -9,6 +9,9 @@
 #' @param score_stat_file String containing the file path and name containing
 #'  the RAREMETALWORKER formatted score statistic file.
 #'
+#' @param group_file_names Vector of strings containing the file paths and names of
+#' the group files to perform the rare-variant aggregation tests with.
+#'
 #' @param altCovariancePath Option to give alternative path to write covariance
 #' files to. Default = NULL. If left as NULL, covariance files will be written
 #' in current directory.
@@ -29,9 +32,10 @@
 #' @return Nothing. Will write the RAREMETAL results to
 #' altRaremetalPath/gene.mask_name.burden.res - ??
 
-call_raremetal <- function(mask_list, score_stat_file, altCovariancePath = NULL,
-                           altGroupFilePath = NULL, altRaremetalPath = NULL,
-                           gene = 'gene', hwe = 0.000001){
+call_raremetal <- function(mask_list, score_stat_file, group_file_names,
+                           altCovariancePath = NULL, altGroupFilePath = NULL,
+                           altRaremetalPath = NULL, gene = 'gene',
+                           hwe = 0.000001){
 
   #First write temporary covFiles and scoreFiles to pass to RAREMETAL
   #scoreFiles first
@@ -42,7 +46,7 @@ call_raremetal <- function(mask_list, score_stat_file, altCovariancePath = NULL,
 
   #Now covariance files
   if(!is.null(altCovariancePath)){
-    output_cov_files <- paste0(altCovariancePath, ".", gene, ".estimated.cov.gz")
+    output_cov_files <- paste0(altCovariancePath, gene, ".estimated.cov.gz")
   }else{
     output_cov_files <- paste0(gene, ".estimated.cov.gz")
   }
@@ -57,19 +61,23 @@ call_raremetal <- function(mask_list, score_stat_file, altCovariancePath = NULL,
     group_file_curr_name <- names(mask_list)[i]
 
     #Check to see if current mask is one created by the package
-    if(group_file_curr_name %in% c("pLOF", "pLOF_narrowMissense", "pLOF_broadMissense")){
-      if(is.null(altGroupFilePath)){
-        group_file_curr <- paste0(gene, ".", group_file_curr_name, ".group.file")
-      }else{
-        group_file_curr <- paste0(altGroupFilePath, ".", gene, ".", group_file_curr_name, ".group.file")
-      }
-    }
+    #if(group_file_curr_name %in% c("pLOF", "pLOF_narrowMissense", "pLOF_broadMissense")){
+    #  if(is.null(altGroupFilePath)){
+    #    group_file_curr <- paste0(gene, ".", group_file_curr_name, ".group.file")
+    #  }else{
+    #    group_file_curr <- paste0(altGroupFilePath, ".", gene, ".", group_file_curr_name, ".group.file")
+    #  }
+    #}else{
+    #  group_file_curr <- paste0(gene, ".", group_file_curr_name, ".group.file")
+    #}
 
+    #Get path to group file
+    group_file_curr <- group_file_names[i]
 
     if(is.null(altRaremetalPath)){
       full_prefix <- group_file_curr_name
     }else{
-      full_prefix <- paste0(altRaremetalPath, ".", group_file_curr_name)
+      full_prefix <- paste0(altRaremetalPath, group_file_curr_name)
     }
 
     cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --maf 1 --hwe {hwe} --prefix {full_prefix}")

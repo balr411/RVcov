@@ -13,9 +13,13 @@ read_user_group_file <- function(group_file){
   mask_list <- list()
 
   for(i in 1:length(group_file)){
-    name_curr <- paste0("userMask", i)
+    if(is.null(names(group_file))){
+      name_curr <- paste0("userMask", i)
+    }else{
+      name_curr <- names(group_file)[i]
+    }
     mask_curr <- readLines(group_file[i])
-    mask_list[[i]] <- unlist(strsplit(mask_curr, split = "\t", fixed = FALSE))[-1]
+    mask_list[[i]] <- data.frame(unlist(strsplit(mask_curr, split = "\t", fixed = FALSE))[-1])
     if(length(mask_list[[i]]) == 0){
       stop(paste0("Mask ", i, " has no variants. Are you sure your mask is in
                     RAREMETAL format?"))

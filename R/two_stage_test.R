@@ -26,8 +26,8 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
                            residual_variance, sample_size){
 
   #Create column putting the SNPs in RAREMETAL format
-  allele_freq_test$SNP <- paste(df_score_stat$CHROM, df_score_stat$POS,
-                             df_score_stat$REF, df_score_stat$ALT, sep = ":")
+  allele_freq_test$SNP <- paste(allele_freq_test$CHROM, allele_freq_test$POS,
+                                allele_freq_test$REF, allele_freq_test$ALT, sep = ":")
 
   #Loop over group files to perform two-stage approach
   to_return <- FALSE

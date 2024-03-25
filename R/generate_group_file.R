@@ -44,6 +44,9 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
                                 pLOF_broadMissense = TRUE,
                                 altGroupFilePath = NULL, mafThreshold = 0.01){
 
+  #Keep track of the paths where the group files are written to
+  file_paths <- c()
+
   anno <- anno[anno$PICK == 1,]
 
   #Delete multi-alleleic variants
@@ -138,6 +141,8 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
 
     #Create data frame to pass back to agg_test
     to_return$pLOF <- data.frame(snp = mask_list[[1]][-1])
+
+    file_paths <- c(file_paths, output_plof)
   }
 
   if(pLOF_narrowMissense){
@@ -172,6 +177,8 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
 
     #Create data frame to pass back to agg_test
     to_return$pLOF_narrowMissense <- data.frame(snp = mask_list[[1]][-1])
+
+    file_paths <- c(file_paths, output_narrowMissense)
   }
 
   if(pLOF_broadMissense){
@@ -208,8 +215,10 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
 
     #Create data frame to pass back to agg_test
     to_return$pLOF_broadMissense <- data.frame(snp = mask_list[[1]][-1])
+
+    file_paths <- c(file_paths, output_broadMissense)
   }
 
-  return(to_return)
+  return(list(to_return, file_paths))
 
 }

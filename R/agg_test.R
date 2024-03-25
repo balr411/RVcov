@@ -95,7 +95,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
                      altRaremetalPath = NULL, mafThreshold = 0.01, gene = NULL,
                      gene_start = NULL, gene_end = NULL, hwe = 0.000001){
 
-  #Add checks here to make sure bcftools and RAREMETAL are installed
+  #Add checks here to make sure bcftools, RAREMETAL, and tabix are installed
 
   #First read in the necessary columns from the score statistic file
   if(!file.exists(score_stat_file)){
@@ -136,9 +136,12 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
 
 
     #Create group files
-    mask_list <- generate_group_file(anno, allele_freq_test, gene, pLOF,
+    mask_list_obj <- generate_group_file(anno, allele_freq_test, gene, pLOF,
                                      pLOF_narrowMissense, pLOF_broadMissense,
                                      altGroupFilePath, mafThreshold)
+
+    mask_list <- mask_list_obj[[1]]
+    file_paths <- mask_list_obj[[2]]
 
   }else if(is.null(group_file)){
     stop("Did not specify which group files to use and did not give any of your own")
@@ -150,6 +153,12 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
   #If group files supplied, read those in
   if(!is.null(group_file)){
     mask_list <- c(mask_list, read_user_group_file(group_file))
+    if(exists("file_paths")){
+      file_paths <- c(file_paths, group_file)
+    }else{
+      file_paths <- c(group_file)
+    }
+
   }
 
   #Perform two-stage approach if desired
@@ -195,7 +204,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
                        altCovariancePath, gene)
 
     #Call RAREMETAL
-    call_raremetal(mask_list, score_stat_file, altCovariancePath,
+    call_raremetal(mask_list, score_stat_file, file_paths, altCovariancePath,
                    altGroupFilePath, altRaremetalPath, gene, hwe) #Have to check what happens if RAREMETAL does not run successfully
 
     to_return <- 1

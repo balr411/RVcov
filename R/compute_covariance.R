@@ -55,7 +55,7 @@ compute_covariance <- function(gt, allele_freq_test, n, residual_variance,
                                 sep = "\t"))
 
   if(!is.null(altCovariancePath)){
-    output_cov_files <- paste0(altCovariancePath, ".", gene, ".estimated.cov")
+    output_cov_files <- paste0(altCovariancePath, gene, ".estimated.cov")
   }else{
     output_cov_files <- paste0(gene, ".estimated.cov")
   }
@@ -65,5 +65,8 @@ compute_covariance <- function(gt, allele_freq_test, n, residual_variance,
   close(fileConn)
 
   system(sprintf("bgzip -f %s", output_cov_files))
+  imp0_cov_gzip <- paste0(output_cov_files, ".gz")
+  system(str_glue("tabix -c \"#\" -s 1 -b 2 -e 2 {imp0_cov_gzip}"))
+
 }
 
