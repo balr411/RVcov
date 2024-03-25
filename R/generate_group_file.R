@@ -12,8 +12,8 @@
 #'  SIFT4G_pred containing LRT, MutationTaster, Polyphen2_HDIV, Polyphen2_HVAR,
 #'  and SIFT4G deleteriousness predictions respectively.
 #'
-#' @param allele_freq The in-sample allele frequency file with columns CHROM,
-#'  POS, REF, ALT, AF, AC, and PVAL.
+#' @param allele_freq The in-sample allele frequency data frame with columns
+#' CHROM, POS, REF, ALT, AF, AC, U_STAT, and PVAL.
 #'
 #' @param gene The name of the gene from the annotation file to use.
 #'

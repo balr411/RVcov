@@ -7,7 +7,9 @@
 #' @param score_stat_file String containing the file path and name containing
 #'  the RAREMETALWORKER formatted score statistic file.
 #'
-#'  @return A list containing the residual variance and sample size of the study
+#'  @importFrom {data.table} {fread}
+#'
+#' @return A list containing the residual variance and sample size of the study
 
 ss_residual_variance <- function(score_stat_file){
   ss <- fread(cmd = paste0("zgrep ^## ", score_stat_file), sep = NULL,

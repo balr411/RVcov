@@ -21,7 +21,7 @@
 #'
 #' @return A data frame with columns CHROM, POS, REF, ALT, AN, AC, AF
 
-generate_allele_frequency <- function(vcf_file, chr){
+generate_allele_frequency <- function(vcf_file, chr, gene_start, gene_end){
   #Note have to add functionality for gene_start and gene_end later
   cm <- str_glue("bcftools +fill-AN-AC {vcf_file} | bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t%AN\\t%AC\\n'")
   af <- system(cm, intern = TRUE)
