@@ -17,6 +17,9 @@
 #' @param allele_freq_reference Data frame from reference panel VCF containing
 #' the columns CHROM, POS, REF, ALT, AN, AC, AF
 #'
+#' @param original_snps A vector containing the SNPs that were in the original
+#' reference allele frequency file before filtering/matching to the test set
+#'
 #' @param gene_start The starting base pair position of the gene on the chromosome.
 #' Default = NULL.
 #'
@@ -31,11 +34,11 @@
 #' @importFrom {Matrix} {Matrix}
 #'
 #' @return A sparse genotype matrix with the genotypes of the individuals,
-#' colnames corresponding to the variant names, and rownames corresponding to
-#' the IDs
+#' colnames corresponding to the SNPs in format CHR:REF:ALT:POS, and rownames
+#' corresponding to the participant IDs
 
 read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
-                     gene_start = NULL, gene_end = NULL){
+                     original_snps, gene_start = NULL, gene_end = NULL){
 
   chr_num <- as.numeric(unlist(strsplit(chr, split = "c"))[2])
 
@@ -49,16 +52,23 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
   }
 
   gt_current <- t(gt_current)
-  vars_gt_current <- colnames(gt_current)
   id_names <- rownames(gt_current)
-  vars_gt_current_positions <- as.numeric(sapply(vars_gt_current, function(s) as.numeric(unlist(strsplit(s, split=":"))[2])))
 
-  #Keep only single-allelic variants that are in the test set
-  gt_current <- gt_current[,vars_gt_current_positions %in% allele_freq_test$POS, drop = FALSE]
+  #Keep only single-allelic variants that are in the test set - here I think we should be doing it from the reference set since we matched based on SNP not pos
+  gt_current <- gt_current[,original_snps %in% allele_freq_reference$SNP, drop = FALSE] # Note there could be no variants shared between the test and reference
+
+  #Now switch the entries for the alleles that had switched alleles
+  idx_gt_switched <- which(allele_freq_reference$ALLELE_SWITCH == 1)
+
+  if(length(idx_gt_switched) > 0){
+    gt_current[,idx_gt_switched][gt_current[,idx_gt_switched] %in% c("0/0", "0|0")] <- 2
+    gt_current[,idx_gt_switched][gt_current[,idx_gt_switched] %in% c("1/1", "1|1")] <- 0
+  }
+
 
   if(dim(gt_current)[2] > 0){ #Should be >= 1 variant in the gene
-    allele_freq_reference_temp <- allele_freq_reference[allele_freq_reference$POS %in% vars_gt_current_positions,]
-    allele_freq_test_temp <- allele_freq_test[allele_freq_test$POS %in% vars_gt_current_positions,]
+    allele_freq_reference_temp <- allele_freq_reference
+    allele_freq_test_temp <- allele_freq_test ###
 
     gt_current[gt_current %in% c("0/0", "0|0")] <- 0
     gt_current[gt_current %in% c("0/1", "1/0", "0|1", "1|0")] <- 1
@@ -77,14 +87,32 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
 
     #If there are still NAs left, should make them 0 (these correspond to variants with no calls)
     gt_current[is_na] <- 0
+
+    #Now add in the variants that weren't in the reference panel at all
+    ## Need to come up with way to add the missing variants to the matrix
+    gt <- matrix(0, nrow = nrow(gt_current), ncol = nrow(allele_freq_test))
+
+    #Match columns
+    idx_in_reference_panel <- match(allele_freq_reference$SNP, allele_freq_test$SNP)
+
+    gt[,idx_in_reference_panel] <- Matrix::as.matrix(gt_current)
+    gt <- Matrix(gt, sparse = TRUE)
+
   }else{
     stop("No variants in this gene!")
   }
 
-  #Add back in the row and column names
-  colnames(gt_current) <- vars_gt_current[vars_gt_current_positions %in% allele_freq_test$POS]
-  rownames(gt_current) <- id_names
+  #Check that the test allele frequency data frame and genotype matrix have the
+  #same number of variants - shouldn't ever happen
+  if(nrow(allele_freq_test) != ncol(gt)){
+    stop("Allele frequency data frame and genotype matrix have differing number of variants.")
+  }
 
-  return(gt_current)
+  #Add back in the row and column names
+  colnames(gt) <- allele_freq_test$SNP
+  rownames(gt) <- id_names
+
+
+  return(gt)
 }
 

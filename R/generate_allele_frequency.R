@@ -5,8 +5,8 @@
 #'
 #' @param vcf_file String containing the file path and name containing the VCF
 #'  of the genotypes of the  set of individuals to be used as the reference
-#'  panel. Note that the chromosome column must be in the format c{chr_number}.
-#'  ie. c1 for chromosome 1.
+#'  panel. Note that the chromosome column will automaticaly be set to the chromosome
+#'  given to the function.
 #'
 #' @param chr The chromosome number on which you want to perform the analysis.
 #' Must be in the format c{chr_number}. ie. c1 for chromosome 1.
@@ -36,6 +36,7 @@ generate_allele_frequency <- function(vcf_file, chr, gene_start, gene_end){
   df$AN <- as.numeric(df$AN)
   df$AC <- as.numeric(df$AC)
   df$AF <- df$AC/df$AN
+  df$CHROM <- as.numeric(unlist(strsplit(chr, split = "c"))[2])
 
   return(df)
 }

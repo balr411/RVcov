@@ -39,7 +39,8 @@
 #' @return List of data frames containing the SNPs in each mask
 #'
 
-generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
+generate_group_file <- function(anno, allele_freq, gene,
+                                pLOF = TRUE,
                                 pLOF_narrowMissense = TRUE,
                                 pLOF_broadMissense = TRUE,
                                 altGroupFilePath = NULL, mafThreshold = 0.01){
@@ -48,16 +49,6 @@ generate_group_file <- function(anno, allele_freq, gene, pLOF = TRUE,
   file_paths <- c()
 
   anno <- anno[anno$PICK == 1,]
-
-  #Delete multi-alleleic variants
-  allele_freq <- anti_join(allele_freq, allele_freq[duplicated(allele_freq$POS),], by = "POS")
-
-  #Delete variants with AF > MAF threshold and AF = 0
-  allele_freq <- allele_freq[allele_freq$AF > 0 & allele_freq$AF <= mafThreshold,]
-
-  if(nrow(allele_freq) == 0){
-    stop(paste0("No variants with 0 < MAF < ", mafThreshold))
-  }
 
   allele_freq$UploadedVariation <- paste(allele_freq$CHROM, allele_freq$POS,
                                          allele_freq$REF, allele_freq$ALT, sep = ":")

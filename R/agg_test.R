@@ -36,7 +36,7 @@
 #'
 #' @param group_file Vector of strings containing the file paths and names of
 #'  the group files to perform the rare-variant aggregation tests with. If not
-#'  specified, must supply anno_file and types of group files to use. Default =
+#'  specified, must supply anno_file (or ) and types of group files to use. Default =
 #'  NULL.
 #'
 #' @param pLOF TRUE or FALSE. Do you want to perform aggregation tests using
@@ -80,6 +80,7 @@
 #'
 #' @importFrom {data.table} {fread}
 #' @importFrom {stringr} {str_glue}
+#' @importFrom {dplyr} {anti_join}
 #'
 #' @return 1 if RAREMETAL was performed using the estimated covariance successfully,
 #' 0 if two-stage approach was performed successfully but covariance did not need
@@ -108,6 +109,39 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
   names(allele_freq_test) <- c("CHROM", "POS", "REF", "ALT", "AF", "AC",
                                "U_STAT", "PVAL")
 
+  #Delete multi-alleleic variants
+  allele_freq_test <- anti_join(allele_freq_test, allele_freq_test[duplicated(allele_freq_test$POS),], by = "POS")
+
+  #Delete variants with AF > MAF threshold and AF = 0
+  allele_freq_test <- allele_freq_test[allele_freq_test$AF > 0 & allele_freq_test$AF <= mafThreshold,]
+
+  #Now read in the reference allele frequency file and take a list of the variants
+  #that are multi-allelic in the test but not the reference
+  #Note need bcftools installed here
+  #Check that vcf exists
+  if(!file.exists(vcf_file)){
+    stop("VCF file doesn't exist!")
+  }
+
+  allele_freq_reference <- generate_allele_frequency(vcf_file, chr, gene_start, gene_end)
+  dup_ref <- allele_freq_reference$POS[duplicated(allele_freq_reference$POS)]
+
+  #Keep track of the variants orignially in the VCF in case the matrix is too
+  #large to read in (this is also needed when the variants in the reference panel
+  #don't match the variants in the test set)
+  original_snps <- paste(allele_freq_reference$CHROM,  allele_freq_reference$POS, allele_freq_reference$REF, allele_freq_reference$ALT, sep = ":")
+  #Add functionality for if the matrix is too big later (functionality for when
+  #the variants don't match is already there)
+
+  if(length(dup_ref) > 0){
+    allele_freq_test <- allele_freq_test[!(allele_freq_test$POS %in% dup_ref),]
+    allele_freq_reference <- allele_freq_reference[!(allele_freq_reference$POS %in% dup_ref),]
+  }
+
+  if(nrow(allele_freq_test) == 0){
+    stop(paste0("No variants with 0 < MAF < ", mafThreshold))
+  }
+
   #Now get residual variance and sample size
   ss_residual_variance_list <- ss_residual_variance(score_stat_file)
   n <- as.numeric(ss_residual_variance_list$sampleSize)
@@ -133,7 +167,6 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
       #Read in annotation file if not already given
       anno <- fread(cmd = paste0("zgrep -v ^## ", anno_file), header = T, data.table = F)
     }
-
 
     #Create group files
     mask_list_obj <- generate_group_file(anno, allele_freq_test, gene, pLOF,
@@ -173,35 +206,52 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
 
   #If necessary, calculate covariance using external reference panel and perform RAREMETAL
   if(calculate_covariance){
-    #Check that vcf exists
-    if(!file.exists(vcf_file)){
-      stop("VCF file doesn't exist!")
+    #Now make sure to match based on SNP and not position (and fix allele switches)
+    #First match on position
+    allele_freq_reference <- allele_freq_reference[allele_freq_reference$POS %in% allele_freq_test$POS,]
+
+    #Create copy of test allele freq that only contains the variants from the reference panel
+    allele_freq_test_red_temp <- allele_freq_test[allele_freq_test$POS %in% allele_freq_reference$POS,]
+
+    ###############################################################################
+    ## The next few lines on allele switching should be put into a function of its own
+    #Find allele switches
+    idx_switched <- which((allele_freq_reference$REF == allele_freq_test_red_temp$ALT) & (allele_freq_reference$ALT == allele_freq_test_red_temp$REF))
+
+    #Track the allele switches (to change them in the genotype matrix later)
+    allele_freq_reference$ALLELE_SWITCH <- 0
+
+    if(length(idx_switched) > 0){
+      allele_freq_reference$ALLELE_SWITCH[idx_switched] <- 1
+
+      #Fix the allele switches
+      allele_freq_reference$REF[idx_switched] <- allele_freq_test_red_temp$REF[idx_switched]
+      allele_freq_reference$ALT[idx_switched] <- allele_freq_test_red_temp$ALT[idx_switched]
+
+      allele_freq_reference$AC[idx_switched] <- allele_freq_reference$AN[idx_switched] - allele_freq_reference$AC[idx_switched]
+      allele_freq_reference$AF[idx_switched] <- 1 - allele_freq_reference$AF[idx_switched]
     }
 
-    #First create allele frequency data frame for reference panel - note need bcftools installed here
-    allele_freq_reference <- generate_allele_frequency(vcf_file, chr, gene_start, gene_end)
+    #Now match based on SNP
+    allele_freq_test$SNP <-  paste(allele_freq_test$CHROM, allele_freq_test$POS, allele_freq_test$REF, allele_freq_test$ALT, sep = ":")
+    allele_freq_reference$SNP <- paste(allele_freq_reference$CHROM,  allele_freq_reference$POS, allele_freq_reference$REF, allele_freq_reference$ALT, sep = ":")
 
-    #Remove multi-allelic variants in test set
-    allele_freq_test <- anti_join(allele_freq_test, allele_freq_test[duplicated(allele_freq_test$POS),], by = "POS")
+    allele_freq_reference <- allele_freq_reference[allele_freq_reference$SNP %in% allele_freq_test$SNP,]
 
-    #remove variants with 0 AF in test set
-    allele_freq_test <- allele_freq_test[allele_freq_test$AF > 0,]
-
-    #Keep track of the variants orignially in the VCF in case the matrix is too
-    #large to read in
-    #original_vars <- allele_freq_reference$POS
-    #Add functionality for this later
-
-    #Now reduce ref allele freq to only include variants found in test set
-    allele_freq_reference <- allele_freq_reference[allele_freq_reference$POS %in% allele_freq_test$POS,]
+    #Note that here the dimension of the reference allele frequency data frame must be
+    #<= dimension of the test allele frequency data
+    if(nrow(allele_freq_reference) > nrow(allele_freq_test)){
+      stop("Dimension of the reference allele frequency data frame is more than the
+           dimension of the test allele frequency data frame after matching")
+    }
 
     #Read in VCF file
     gt <- read_vcf(vcf_file, chr, allele_freq_test, allele_freq_reference,
-                   gene_start, gene_end)
+                   original_snps, gene_start, gene_end)
 
     #Compute covariance
     compute_covariance(gt, allele_freq_test, n, resid_var,
-                       altCovariancePath, gene)
+                       altCovariancePath, gene) #currently not getting the same with InPSYght so check this
 
     #Call RAREMETAL
     call_raremetal(mask_list, score_stat_file, file_paths, altCovariancePath,
