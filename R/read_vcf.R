@@ -78,7 +78,7 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
     n_row <- nrow(gt_current)
     n_col <- ncol(gt_current)
 
-    gt_current <- suppressWarnings(Matrix(as.numeric(gt_current), nrow = n_row, ncol = n_col, sparse = TRUE)) #Note the NAs for missing values; expect warning here so suppress it
+    gt_current <- suppressWarnings(Matrix::Matrix(as.numeric(gt_current), nrow = n_row, ncol = n_col, sparse = TRUE)) #Note the NAs for missing values; expect warning here so suppress it
 
     gt_current <- sweep(gt_current, 2, 2*allele_freq_reference_temp$AF) #subtract the allele frequencies rowwise
 
@@ -97,7 +97,7 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
     idx_in_reference_panel <- match(allele_freq_reference$SNP, allele_freq_test$SNP)
 
     gt[,idx_in_reference_panel] <- Matrix::as.matrix(gt_current)
-    gt <- Matrix(gt, sparse = TRUE)
+    gt <- Matrix::Matrix(gt, sparse = TRUE)
 
   }else{
     stop("No variants in this gene!")
