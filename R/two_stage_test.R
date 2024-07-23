@@ -26,6 +26,7 @@
 #' @importFrom data.table fread
 #' @importFrom stringr str_glue
 #' @importFrom stats pnorm
+#' @importFrom CompQuadForm davies
 #'
 #' @return TRUE/FALSE to compute covariance or not if at least one of the masks
 #' passes the -log10(p-value) threshold
@@ -61,9 +62,22 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
       test_stat_num_wb <- sum(weights_curr * allele_freq_test_temp$U_STAT)
       test_stat_var_wb <- sum(weights_curr^2 * (2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF)))/residual_variance
       test_stat_wb <- test_stat_num_wb/sqrt(test_stat_var_wb)
-      pval_wb <-  2*stats::pnorm(-abs(test_stat_wb)) #Not getting exact same but similar - need to check more comprehensively
+      pval_wb <-  2*stats::pnorm(-abs(test_stat_wb)) #Not getting exact same but similar - need to check more comprehensively (this could be because the weights may need to be square rooted)
 
       if(-log10(pval_wb) > two_stage_threshold){
+        to_return <- TRUE
+        break
+      }
+    }
+
+    if(SKAT){
+      test_stat_num_SKAT <- sum(allele_freq_test_temp$U_STAT^2)/residual_variance^2
+      eigen_vals <- 2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF)
+      pval_SKAT <- CompQuadForm::davies(test_stat_num_SKAT, lambda = eigen_vals,
+                                        h = rep(1, length(eigen_vals)),
+                                        delta = rep(0, length(eigen_vals))) #Need to test this when cluster back online
+
+      if(-log10(pval_SKAT) > two_stage_threshold){
         to_return <- TRUE
         break
       }
