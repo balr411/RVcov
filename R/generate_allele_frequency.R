@@ -17,7 +17,7 @@
 #' @param gene_end The ending base pair position of the gene on the chromosome.
 #' Default = NULL.
 #'
-#' @importFrom {stringr} {str_glue}
+#' @importFrom stringr str_glue
 #'
 #' @return A data frame with columns CHROM, POS, REF, ALT, AN, AC, AF
 

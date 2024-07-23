@@ -16,8 +16,8 @@
 #'
 #' @param sample_size The sample size from the study
 #'
-#' @importFrom {data.table} {fread}
-#' @importFrom {stringr} {str_glue}
+#' @importFrom data.table fread
+#' @importFrom stringr str_glue
 #'
 #' @return TRUE/FALSE to compute covariance or not if at least one of the masks
 #' passes the -log10(p-value) threshold

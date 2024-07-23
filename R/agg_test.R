@@ -78,9 +78,9 @@
 #' @param hwe Hardy-Weinberg equilibrium p-value cut-off for rare-variant
 #' aggregation testing. Default = 0.000001.
 #'
-#' @importFrom {data.table} {fread}
-#' @importFrom {stringr} {str_glue}
-#' @importFrom {dplyr} {anti_join}
+#' @importFrom data.table fread
+#' @importFrom stringr str_glue
+#' @importFrom dplyr anti_join
 #'
 #' @return 1 if RAREMETAL was performed using the estimated covariance successfully,
 #' 0 if two-stage approach was performed successfully but covariance did not need

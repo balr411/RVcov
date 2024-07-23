@@ -7,7 +7,7 @@
 #' @param score_stat_file String containing the file path and name containing
 #'  the RAREMETALWORKER formatted score statistic file.
 #'
-#'  @importFrom {data.table} {fread}
+#'  @importFrom data.table fread
 #'
 #' @return A list containing the residual variance and sample size of the study
 

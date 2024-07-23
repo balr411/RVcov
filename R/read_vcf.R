@@ -26,13 +26,13 @@
 #' @param gene_end The ending base pair position of the gene on the chromosome.
 #' Default = NULL.
 #'
-#' @importFrom {VariantAnnotation} {ScanVcfParam}
-#' @importFrom {VariantAnnotation} {readGT}
-#' @importFrom {GenomicRanges} {GRanges}
-#' @importFrom {IRanges} {IRanges}
-#' @importFrom {dplyr} {anti_join}
-#' @importFrom {Matrix} {Matrix}
-#' @importFrom {Matrix} {as.matrix}
+#' @importFrom VariantAnnotation ScanVcfParam
+#' @importFrom VariantAnnotation readGT
+#' @importFrom GenomicRanges GRanges
+#' @importFrom IRanges IRanges
+#' @importFrom dplyr anti_join
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix as.matrix
 #'
 #' @return A sparse genotype matrix with the genotypes of the individuals,
 #' colnames corresponding to the SNPs in format CHR:REF:ALT:POS, and rownames

@@ -33,8 +33,8 @@
 #'  we assume that the alternate allele is coded as the minor allele.
 #'  Default = 0.01.
 #'
-#' @importFrom {dplyr} {anti_join}
-#' @importFrom {stringr} {str_count}
+#' @importFrom dplyr anti_join
+#' @importFrom stringr str_count
 #'
 #' @return List of data frames containing the SNPs in each mask
 #'

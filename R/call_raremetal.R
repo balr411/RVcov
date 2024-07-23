@@ -27,7 +27,7 @@
 #'
 #' @param hwe Hardy-Weinberg equilibrium p-value cut-off. Default = 0.000001.
 #'
-#' @importFrom {stringr} {str_glue}
+#' @importFrom stringr str_glue
 #'
 #' @return Nothing. Will write the RAREMETAL results to
 #' altRaremetalPath/gene.mask_name.burden.res - ??

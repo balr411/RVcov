@@ -11,7 +11,7 @@ ss_residual_variance(score_stat_file)
 \item{score_stat_file}{String containing the file path and name containing
  the RAREMETALWORKER formatted score statistic file.
 
- @importFrom {data.table} {fread}}
+ @importFrom data.table fread}
 }
 \value{
 A list containing the residual variance and sample size of the study
