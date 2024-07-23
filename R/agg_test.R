@@ -86,7 +86,7 @@
 #' 0 if two-stage approach was performed successfully but covariance did not need
 #' to be computed.
 #'
-#' @examples Use examples of data that I simulate
+#' @examples #Use examples of data that I simulate (Note this will cause devtool::check() issue)
 
 agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
                      anno = NULL, two_stage = FALSE, two_stage_threshold = 3,

@@ -112,5 +112,5 @@ A function that perfroms various rare-variant aggregation tests
  covariance is above some threshold.
 }
 \examples{
-Use examples of data that I simulate
+#Use examples of data that I simulate (Note this will cause devtool::check() issue)
 }
