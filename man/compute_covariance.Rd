@@ -29,9 +29,7 @@ files to. Default = NULL. If left as NULL, covariance files will be written
 in current directory.}
 
 \item{gene}{The name of the gene to use in the name of the covariance file.
- Default = 'gene'.
-
- @importFrom Matrix Diagonal}
+Default = 'gene'.}
 }
 \value{
 Nothing. Writes and bgzips covariance file in the format

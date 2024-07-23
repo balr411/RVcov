@@ -20,7 +20,7 @@
 #' @param gene The name of the gene to use in the name of the covariance file.
 #'  Default = 'gene'.
 #'
-#'  @importFrom Matrix Diagonal
+#' @importFrom Matrix Diagonal
 #'
 #' @return Nothing. Writes and bgzips covariance file in the format
 #' altCovariancePath/gene.estimated.cov.gz

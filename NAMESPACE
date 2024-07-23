@@ -2,9 +2,10 @@
 
 importFrom(GenomicRanges,GRanges)
 importFrom(IRanges,IRanges)
-importFrom(IRanges,Rle)
+importFrom(Matrix,Diagonal)
 importFrom(Matrix,Matrix)
 importFrom(Matrix,as.matrix)
+importFrom(S4Vectors,Rle)
 importFrom(VariantAnnotation,ScanVcfParam)
 importFrom(VariantAnnotation,readGT)
 importFrom(data.table,fread)
