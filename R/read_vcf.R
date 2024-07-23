@@ -30,6 +30,7 @@
 #' @importFrom VariantAnnotation readGT
 #' @importFrom GenomicRanges GRanges
 #' @importFrom IRanges IRanges
+#' @importFrom IRanges Rle
 #' @importFrom dplyr anti_join
 #' @importFrom Matrix Matrix
 #' @importFrom Matrix as.matrix
@@ -48,7 +49,7 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
   }else if((is.null(gene_start) & !is.null(gene_end)) | (!is.null(gene_start) & is.null(gene_end))){
     stop("Only one gene boundary given.")
   }else{
-    current_range <- ScanVcfParam(which = GRanges(seqnames = Rle(chr_num), ranges = IRanges(start = gene_start, end = gene_end)))
+    current_range <- ScanVcfParam(which = GRanges(seqnames = IRanges::Rle(chr_num), ranges = IRanges(start = gene_start, end = gene_end)))
     gt_current <- readGT(file = vcf_file, param = current_range)
   }
 

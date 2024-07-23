@@ -12,7 +12,7 @@
 #' @return A list containing the residual variance and sample size of the study
 
 ss_residual_variance <- function(score_stat_file){
-  ss <- fread(cmd = paste0("zgrep ^## ", score_stat_file), sep = NULL,
+  ss <- data.table::fread(cmd = paste0("zgrep ^## ", score_stat_file), sep = NULL,
               data.table = FALSE, header = FALSE)[[1]]
 
   sampleSize <- strsplit(ss[4], split = "=")[[1]][2]

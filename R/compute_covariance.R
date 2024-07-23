@@ -20,6 +20,8 @@
 #' @param gene The name of the gene to use in the name of the covariance file.
 #'  Default = 'gene'.
 #'
+#'  @importFrom Matrix Diagonal
+#'
 #' @return Nothing. Writes and bgzips covariance file in the format
 #' altCovariancePath/gene.estimated.cov.gz
 
@@ -34,8 +36,8 @@ compute_covariance <- function(gt, allele_freq_test, n, residual_variance,
 
   C_mat <- crossprod(gt)
   diag(C_mat)[diag(C_mat) == 0] <- 1
-  D_g <- Diagonal(x = sqrt(diag(C_mat)))
-  D_mat <- Diagonal(x = sqrt(2*n*allele_freq_test$AF*(1-allele_freq_test$AF)))
+  D_g <- Matrix::Diagonal(x = sqrt(diag(C_mat)))
+  D_mat <- Matrix::Diagonal(x = sqrt(2*n*allele_freq_test$AF*(1-allele_freq_test$AF)))
   D_g_inv <- solve(D_g)
   output_mat <- (D_mat %*% D_g_inv %*% C_mat %*% D_g_inv %*% D_mat)/(n*residual_variance)
 

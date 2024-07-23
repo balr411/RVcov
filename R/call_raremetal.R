@@ -12,6 +12,13 @@
 #' @param group_file_names Vector of strings containing the file paths and names of
 #' the group files to perform the rare-variant aggregation tests with.
 #'
+#' @param burden Perform simple (unweighted) burden test? Must be TRUE or FALSE.
+#'
+#' @param wburden Perform weight burden test? Weights are from beta(MAF, 1, 25)
+#' distribution. Must be TRUE or FALSE.
+#'
+#' @param SKAT Perform simple (unweighted) SKAT? Must be TRUE or FALSE.
+#'
 #' @param altCovariancePath Option to give alternative path to write covariance
 #' files to. Default = NULL. If left as NULL, covariance files will be written
 #' in current directory.
@@ -33,6 +40,7 @@
 #' altRaremetalPath/gene.mask_name.burden.res - ??
 
 call_raremetal <- function(mask_list, score_stat_file, group_file_names,
+                           burden, wburden, SKAT,
                            altCovariancePath = NULL, altGroupFilePath = NULL,
                            altRaremetalPath = NULL, gene = 'gene',
                            hwe = 0.000001){
@@ -80,7 +88,22 @@ call_raremetal <- function(mask_list, score_stat_file, group_file_names,
       full_prefix <- paste0(altRaremetalPath, group_file_curr_name)
     }
 
-    cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    if(burden & !wburden &!SKAT){
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }else if(!burden & wburden & !SKAT){
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --BBeta --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }else if(!burden & !wburden & SKAT){
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }else if(burden & wburden & !SKAT){
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --BBeta --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }else if(burden & !wburden & SKAT){
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }else if(!burden & wburden & SKAT){
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --BBeta --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }else{
+      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --BBeta --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+    }
+
     system(cm)
   }
 

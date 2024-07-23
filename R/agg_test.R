@@ -19,6 +19,15 @@
 #' @param chr The chromosome number on which you want to perform the analysis.
 #' Must be in the format c{chr_number}. ie. c1 for chromosome 1.
 #'
+#' @param burden Perform simple (unweighted) burden test? Must be TRUE or FALSE.
+#' Default = TRUE.
+#'
+#' @param wburden Perform weight burden test? Weights are from beta(MAF, 1, 25)
+#' distribution. Must be TRUE or FALSE. Default = FALSE.
+#'
+#' @param SKAT Perform simple (unweighted) SKAT? Must be TRUE or FALSE.
+#' Default = FALSE.
+#'
 #' @param anno_file String containing the file path and name containing the
 #'  VEP annotation file to create the group files. If not specified, must give
 #'  argument to group_file. Default = NULL.
@@ -88,7 +97,8 @@
 #'
 #' @examples #Use examples of data that I simulate (Note this will cause devtool::check() issue)
 
-agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
+agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FALSE,
+                     SKAT = FALSE, anno_file = NULL,
                      anno = NULL, two_stage = FALSE, two_stage_threshold = 3,
                      group_file = NULL, pLOF = FALSE,
                      pLOF_narrowMissense = FALSE, pLOF_broadMissense = FALSE,
@@ -103,14 +113,14 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
     stop("Score statistic file doesn't exist!")
   }
 
-  allele_freq_test <- fread(cmd = str_glue("zgrep -v ^# {score_stat_file}"),
+  allele_freq_test <- data.table::fread(cmd = stringr::str_glue("zgrep -v ^# {score_stat_file}"),
                             select = c(1, 2, 3, 4, 7, 8, 14, 17), data.table = FALSE)
 
   names(allele_freq_test) <- c("CHROM", "POS", "REF", "ALT", "AF", "AC",
                                "U_STAT", "PVAL")
 
   #Delete multi-alleleic variants
-  allele_freq_test <- anti_join(allele_freq_test, allele_freq_test[duplicated(allele_freq_test$POS),], by = "POS")
+  allele_freq_test <- dplyr::anti_join(allele_freq_test, allele_freq_test[duplicated(allele_freq_test$POS),], by = "POS")
 
   #Delete variants with AF > MAF threshold and AF = 0
   allele_freq_test <- allele_freq_test[allele_freq_test$AF > 0 & allele_freq_test$AF <= mafThreshold,]
@@ -165,7 +175,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
            file. Please supply only one of these.")
     }else if(!is.null(anno_file) & is.null(anno)){
       #Read in annotation file if not already given
-      anno <- fread(cmd = paste0("zgrep -v ^## ", anno_file), header = T, data.table = F)
+      anno <- data.table::fread(cmd = paste0("zgrep -v ^## ", anno_file), header = T, data.table = F)
     }
 
     #Create group files
@@ -197,8 +207,8 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
   #Perform two-stage approach if desired
   if(two_stage){
     calculate_covariance <- two_stage_test(mask_list, allele_freq_test,
-                                           two_stage_threshold,
-                                           residual_variance = resid_var,
+                                           two_stage_threshold, burden, wburden,
+                                           SKAT, residual_variance = resid_var,
                                            sample_size = n)
   }else{
     calculate_covariance <- TRUE
@@ -254,8 +264,9 @@ agg_test <- function(score_stat_file, vcf_file, chr, anno_file = NULL,
                        altCovariancePath, gene) #currently not getting the same with InPSYght so check this
 
     #Call RAREMETAL
-    call_raremetal(mask_list, score_stat_file, file_paths, altCovariancePath,
-                   altGroupFilePath, altRaremetalPath, gene, hwe) #Have to check what happens if RAREMETAL does not run successfully
+    call_raremetal(mask_list, score_stat_file, file_paths, burden, wburden, SKAT,
+                   altCovariancePath, altGroupFilePath, altRaremetalPath, gene,
+                   hwe) #Have to check what happens if RAREMETAL does not run successfully
 
     to_return <- 1
   }else{

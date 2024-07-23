@@ -2,11 +2,13 @@
 
 importFrom(GenomicRanges,GRanges)
 importFrom(IRanges,IRanges)
+importFrom(IRanges,Rle)
 importFrom(Matrix,Matrix)
 importFrom(Matrix,as.matrix)
 importFrom(VariantAnnotation,ScanVcfParam)
 importFrom(VariantAnnotation,readGT)
 importFrom(data.table,fread)
 importFrom(dplyr,anti_join)
+importFrom(stats,pnorm)
 importFrom(stringr,str_count)
 importFrom(stringr,str_glue)

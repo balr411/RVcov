@@ -8,6 +8,9 @@ agg_test(
   score_stat_file,
   vcf_file,
   chr,
+  burden = TRUE,
+  wburden = FALSE,
+  SKAT = FALSE,
   anno_file = NULL,
   anno = NULL,
   two_stage = FALSE,
@@ -37,6 +40,15 @@ ie. c1 for chromosome 1.}
 
 \item{chr}{The chromosome number on which you want to perform the analysis.
 Must be in the format c{chr_number}. ie. c1 for chromosome 1.}
+
+\item{burden}{Perform simple (unweighted) burden test? Must be TRUE or FALSE.
+Default = TRUE.}
+
+\item{wburden}{Perform weight burden test? Weights are from beta(MAF, 1, 25)
+distribution. Must be TRUE or FALSE. Default = FALSE.}
+
+\item{SKAT}{Perform simple (unweighted) SKAT? Must be TRUE or FALSE.
+Default = FALSE.}
 
 \item{anno_file}{String containing the file path and name containing the
 VEP annotation file to create the group files. If not specified, must give

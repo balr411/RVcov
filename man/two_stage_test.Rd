@@ -8,6 +8,9 @@ two_stage_test(
   mask_list,
   allele_freq_test,
   two_stage_threshold = 3,
+  burden,
+  wburden,
+  SKAT,
   residual_variance,
   sample_size
 )
@@ -21,6 +24,13 @@ to include in each test.}
 
 \item{two_stage_threshold}{-log10(p-value) threshold to use for two-stage
 approach. Default = 3.}
+
+\item{burden}{Perform simple (unweighted) burden test? Must be TRUE or FALSE.}
+
+\item{wburden}{Perform weight burden test? Weights are from beta(MAF, 1, 25)
+distribution. Must be TRUE or FALSE.}
+
+\item{SKAT}{Perform simple (unweighted) SKAT? Must be TRUE or FALSE.}
 
 \item{residual_variance}{The residual variance from the study}
 

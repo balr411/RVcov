@@ -8,6 +8,9 @@ call_raremetal(
   mask_list,
   score_stat_file,
   group_file_names,
+  burden,
+  wburden,
+  SKAT,
   altCovariancePath = NULL,
   altGroupFilePath = NULL,
   altRaremetalPath = NULL,
@@ -24,6 +27,13 @@ the RAREMETALWORKER formatted score statistic file.}
 
 \item{group_file_names}{Vector of strings containing the file paths and names of
 the group files to perform the rare-variant aggregation tests with.}
+
+\item{burden}{Perform simple (unweighted) burden test? Must be TRUE or FALSE.}
+
+\item{wburden}{Perform weight burden test? Weights are from beta(MAF, 1, 25)
+distribution. Must be TRUE or FALSE.}
+
+\item{SKAT}{Perform simple (unweighted) SKAT? Must be TRUE or FALSE.}
 
 \item{altCovariancePath}{Option to give alternative path to write covariance
 files to. Default = NULL. If left as NULL, covariance files will be written

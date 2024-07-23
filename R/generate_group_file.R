@@ -85,11 +85,11 @@ generate_group_file <- function(anno, allele_freq, gene,
       warning("sumAlgs column given in VEP annotation, will use this for
               deleteriousness prediction")
     }else{
-      anno$LRT_pred <- str_count(anno$LRT_pred, "D")
-      anno$MutationTaster_pred <- str_count(anno$MutationTaster_pred, "D") + str_count(anno$MutationTaster_pred, "A")
-      anno$Polyphen2_HDIV_pred <- str_count(anno$Polyphen2_HDIV_pred, "D") + str_count(anno$Polyphen2_HDIV_pred, "P")
-      anno$Polyphen2_HVAR_pred <- str_count(anno$Polyphen2_HVAR_pred, "D") + str_count(anno$Polyphen2_HVAR_pred, "P")
-      anno$SIFT4G_pred <- str_count(anno$SIFT4G_pred, "D")
+      anno$LRT_pred <- stringr::str_count(anno$LRT_pred, "D")
+      anno$MutationTaster_pred <- stringr::str_count(anno$MutationTaster_pred, "D") + stringr::str_count(anno$MutationTaster_pred, "A")
+      anno$Polyphen2_HDIV_pred <- stringr::str_count(anno$Polyphen2_HDIV_pred, "D") + stringr::str_count(anno$Polyphen2_HDIV_pred, "P")
+      anno$Polyphen2_HVAR_pred <- stringr::str_count(anno$Polyphen2_HVAR_pred, "D") + stringr::str_count(anno$Polyphen2_HVAR_pred, "P")
+      anno$SIFT4G_pred <- stringr::str_count(anno$SIFT4G_pred, "D")
       anno$LRT_pred <- ifelse(anno$LRT_pred > 0, 1, 0)
       anno$MutationTaster_pred <- ifelse(anno$MutationTaster_pred > 0, 1, 0)
       anno$Polyphen2_HDIV_pred <- ifelse(anno$Polyphen2_HDIV_pred > 0, 1, 0)
