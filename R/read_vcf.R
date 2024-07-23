@@ -32,6 +32,7 @@
 #' @importFrom {IRanges} {IRanges}
 #' @importFrom {dplyr} {anti_join}
 #' @importFrom {Matrix} {Matrix}
+#' @importFrom {Matrix} {as.matrix}
 #'
 #' @return A sparse genotype matrix with the genotypes of the individuals,
 #' colnames corresponding to the SNPs in format CHR:REF:ALT:POS, and rownames
