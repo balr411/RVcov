@@ -62,8 +62,8 @@ mismatched reference panels like this in general, there was not a large differen
 in performance when doing so in our paper. Since we used the European subset of 
 1000G to generate the summary statistics, there were no publicly available European
 samples remaining to use as the reference panel. The VCF containing the African
-subset of the 1000G whole genome sequencing data is available with this package,
-and the file is:
+subset of the 1000G whole genome sequencing data for the *NEB* gene is available 
+with this package, and the file is:
 
 ```{r}
 vcf_file <- "vignetteData/chr2.1000G.african_unrel.NEB.vcf.gz"
@@ -120,7 +120,7 @@ annotation file:
 **PICK**: A column that is 1 if the annotation is to be used or not. We will set this 
 to 1 for all variants since this filtering step should have already been done by 1000G. 
 
-**#Uploaded_variation**: A column containing the variant in the format CHROM:POS:REF:ALT.
+**Uploaded_variation**: A column containing the variant in the format CHROM:POS:REF:ALT.
 
 **Consequence**: The predicted consequence of the variant.
 
@@ -162,6 +162,21 @@ pLOF <- pLOF_narrowMissense <- pLOF_broadMissense <- TRUE
 ```
 
 Now that we have put together all of the required parameters, we can call *agg_test()*:
+
+```{r}
+agg_test(score_stat_file, vcf_file, chr, burden, wburden,
+                     SKAT, anno_file = NULL,
+                     anno = df_vep_anno, two_stage = two_stage, 
+                     two_stage_threshold = two_stage_threshold,
+                     group_file = NULL, pLOF = pLOF,
+                     pLOF_narrowMissense = pLOF_narrowMissense,
+                     pLOF_broadMissense = pLOF_broadMissense,
+                     altGroupFilePath = NULL, altCovariancePath = NULL,
+                     altRaremetalPath = NULL, mafThreshold = 0.01, gene = NULL,
+                     gene_start = gene_start, gene_end = gene_end, 
+                     hwe = 0.000001)
+```
+
 
 
 
