@@ -53,9 +53,12 @@ generate_group_file <- function(anno, allele_freq, gene,
   allele_freq$UploadedVariation <- paste(allele_freq$CHROM, allele_freq$POS,
                                          allele_freq$REF, allele_freq$ALT, sep = ":")
 
+  #Change the name of the uploaded variation column if it exists
+  names(anno)[names(anno) == '#Uploaded_variation'] <- "Uploaded_variation"
+
 
   #Match variants in annotation file to those in allele frequency file
-  idx_common_anno <- which(anno$'#Uploaded_variation' %in% allele_freq$UploadedVariation)
+  idx_common_anno <- which(anno$Uploaded_variation %in% allele_freq$UploadedVariation)
   anno <- anno[idx_common_anno,]
 
   allele_freq_plof <- allele_freq_narrowMissense <- allele_freq_broadMissense <- allele_freq
@@ -110,7 +113,7 @@ generate_group_file <- function(anno, allele_freq, gene,
 
     mask_list <- as.list(gene)
 
-    to_add <- unique(anno_plof[anno_plof$SYMBOL == gene,]$'#Uploaded_variation')
+    to_add <- unique(anno_plof[anno_plof$SYMBOL == gene,]$Uploaded_variation)
     if(length(to_add) > 0){
       if(sum(is.na(to_add)) == 0){
         mask_list[[1]] <- c(mask_list[[1]], to_add)
@@ -145,7 +148,7 @@ generate_group_file <- function(anno, allele_freq, gene,
 
     mask_list <- as.list(gene)
 
-    to_add <- unique(anno_narrowMissense[anno_narrowMissense$SYMBOL == gene,]$'#Uploaded_variation')
+    to_add <- unique(anno_narrowMissense[anno_narrowMissense$SYMBOL == gene,]$Uploaded_variation)
 
     if(length(to_add) > 0){
       if(sum(is.na(to_add)) == 0){
@@ -181,7 +184,7 @@ generate_group_file <- function(anno, allele_freq, gene,
 
     mask_list <- as.list(gene)
 
-    to_add <- unique(anno_broadMissense[anno_broadMissense$SYMBOL == gene,]$'#Uploaded_variation')
+    to_add <- unique(anno_broadMissense[anno_broadMissense$SYMBOL == gene,]$Uploaded_variation)
 
     if(length(to_add) > 0){
       if(sum(is.na(to_add)) == 0){

@@ -23,13 +23,85 @@ library("stringr")
 In this vignette we will walk through an example of using the package on summary 
 statistics generated using 503 Europeans from 1000G and a reference panel 
 of 661 Africans from 1000G. A detailed description of how the data was generated 
-can be found in the README file. 
+can be found in the README file. To perform aggregation testing, we need to pass
+at a minimum the following parameters to the function *agg_test()*:
+
+**score_stat_file**: The file name and path of the score statistic file.
+
+**vcf_file**: The file name and path of the VCF to be used as the reference panel.
+
+**chr**: The numeric chromosome number to use in this analysis. 
+
+At least one of **burden**, **wburden**, or **SKAT** to be set to TRUE. By default 
+**burden** is TRUE and the other 2 are FALSE. 
+
+**two_stage**: Whether or not to perform the two-stage approach. Defaults to FALSE. 
+If TRUE, we need to also specify **two_stage_threshold**, which is by default set
+to 3. 
+
+Either **group_file**: Vector of strings containing the file paths and names of
+the group files to perform the rare-variant aggregation tests with. Or: at least 
+one of **pLOF**, **pLOF_narrowMissense**, or **pLOF_broadMissense** to be set to 
+TRUE. If the latter is used, we also need to specify **anno_file** or **anno**: 
+The former being the file name and path to a VEP annotation 
+file, the latter being an annotation file in VEP output format that has already 
+been read into R. 
+
+We may also want to specify **gene_start** and **gene_end**: The start and end 
+points of the gene to perform the aggregation testing on. 
+
+For the purposes of this vignette, the score statistic file is:
+
+```{r}
+score_stat_file <- "vignetteData/NEB.european.Phenotype.singlevar.score.txt.gz"
+```
+
+In this example we are going to use the African subset of the 1000G whole 
+genome sequencing data as our reference panel. Although we don't recommend using 
+mismatched reference panels like this in general, there was not a large difference
+in performance when doing so in our paper. Since we used the European subset of 
+1000G to generate the summary statistics, there were no publicly available European
+samples remaining to use as the reference panel. The VCF containing the African
+subset of the 1000G whole genome sequencing data is available with this package,
+and the file is:
+
+```{r}
+vcf_file <- "vignetteData/chr2.1000G.african_unrel.NEB.vcf.gz"
+```
+
+
+Now note that the phenotype was generated using the *NEB* gene on chromosome
+2, which has gene boundaries 151485339-151734476. So to call *agg_test()* we can
+set **chr** to 2, **gene_start** to 151485339, and **gene_end** to 151734476. 
+
+```{r}
+chr <- 2
+gene_start <- 151485339
+gene_end <- 151734476
+```
+
+In this example we will also perform each of the simple and weighted burden test 
+as well as SKAT: 
+
+```{r}
+burden <- wburden <- SKAT <- TRUE
+```
+
+Let us also perform the two stage approach with the default threshold of 3:
+
+```{r}
+two_stage <- TRUE
+two_stage_threshold <- 3
+```
+
 
 Also included in this package is an annotation file distributed from 1000G. Note 
-that it is not in VEP format, and passing this annotation file directly to \texttt{agg_test}
+that it is not in VEP format, and passing this annotation file directly to *agg_test()*
 will either cause an error or lead to unexpected behavior. Hence we will read in 
 the annotation file in this vignette, and change the columns so that they are in 
-VEP format. 
+VEP format. After doing so, we will use each of the 3 possible annotation mask
+definitions (pLOF, pLOF + missense(narrow), pLOF + missense(broad)) to perform 
+aggregation testing. 
 
 ```{r}
 anno_file <- "vignetteData/chr2.1000G.NEB.rare_variants.annotation.txt"
@@ -42,5 +114,56 @@ Note that there are many columns in the annotation file:
 dim(df_anno)
 ```
 
-Now note that the phenotype was generated using the \textit{NEB} gene on chromosome
-2, which has gene boundaries 151485339-151734476. 
+However this R package assumes only the following columns are present in an
+annotation file: 
+
+**PICK**: A column that is 1 if the annotation is to be used or not. We will set this 
+to 1 for all variants since this filtering step should have already been done by 1000G. 
+
+**#Uploaded_variation**: A column containing the variant in the format CHROM:POS:REF:ALT.
+
+**Consequence**: The predicted consequence of the variant.
+
+**LRT_pred**: The LRT deleteriousness prediction for the variant. Note that the 
+1000G annotation file does not contain LRT predictions, so we will set this to "D"
+for all variants so that no variant is excluded from our masks due to this prediction.
+
+**MutationTaster_pred**: MutationTaster deleteriousness prediction. 
+
+**Polyphen2_HDIV_pred**: Polyphen2_HDIV deleteriousness prediction. 
+
+**Polyphen2_HVAR_pred**: Polyphen2_HVAR deleteriousness prediction.
+
+**SIFT4G_pred**: SIFT4G deleteriousness prediction. The 1000G annotations have 
+only SIFT predictions so we will use those in place of SIFT4G predictions. 
+
+**SYMBOL**: The gene name. This is *NEB* for all variants in this file.
+
+We can easily create a new data frame with only those columns:
+
+```{r}
+df_vep_anno <- data.frame(PICK = rep(1, nrow(df_anno)),
+                          Uploaded_variation = paste(2, df_anno$POS, df_anno$REF, df_anno$ALT, sep = ":"),
+                          Consequence = df_anno$EFFECT,
+                          LRT_pred = rep("D", nrow(df_anno)),
+                          MutationTaster_pred = df_anno$MutationTaster_pred,
+                          Polyphen2_HDIV_pred = df_anno$Polyphen2_HDIV_pred,
+                          Polyphen2_HVAR_pred = df_anno$Polyphen2_HVAR_pred,
+                          SIFT4G_pred = df_anno$SIFT_pred,
+                          SYMBOL = df_anno$GENE)
+
+head(df_vep_anno)
+```
+
+And as stated already, we will use all 3 annotation definitions for our masks: 
+
+```{r}
+pLOF <- pLOF_narrowMissense <- pLOF_broadMissense <- TRUE
+```
+
+Now that we have put together all of the required parameters, we can call *agg_test()*:
+
+
+
+
+
