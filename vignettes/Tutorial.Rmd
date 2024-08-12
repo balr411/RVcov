@@ -15,5 +15,49 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(externalCov)
+library("externalCov")
+library("data.table")
+library("stringr")
 ```
+
+
+In this vignette we will walk through an example of using the package on summary 
+statistics generated using 503 Europeans from 1000G and a reference panel 
+of 661 Africans from 1000G. A detailed description of how the data was generated 
+can be found in the README file. First we must find the location of the summary 
+statistic file relative to the working environment.
+
+```{r}
+read_example <- function(path = NULL) {
+  if (is.null(path)) {
+    dir(system.file("extdata", package = "externalCov"))
+  } else {
+    system.file("extdata", path, package = "externalCov", mustWork = TRUE)
+  }
+}
+
+score_stat_dir <- read_example("NEB.european.Phenotype.singlevar.score.txt.gz")
+
+```
+
+Also included in this package is an annotation file distributed from 1000G. Note 
+that it is not in VEP format, and passing this annotation file directly to \texttt{agg_test}
+will either cause an error or lead to unexpected behavior. Hence we will read in 
+the annotation file in this vignette, and change the columns so that they are in 
+VEP format. 
+
+```{r}
+anno_file <- read_example("chr2.1000G.NEB.rare_variants.annotation.txt")
+df_anno <- fread(anno_file, header = TRUE, data.table = FALSE)
+```
+
+Note that there are many columns in the annotation file: 
+
+```{r}
+dim(df_anno)
+```
+
+Now note that the phenotype was generated using the \textit{NEB} gene on chromosome
+2, which has gene boundaries 151485339-151734476. 
+
+
