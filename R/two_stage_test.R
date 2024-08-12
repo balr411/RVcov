@@ -47,7 +47,7 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
 
     if(burden){
       test_stat_num <- sum(allele_freq_test_temp$U_STAT)
-      test_stat_var <- sum(2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF))/residual_variance ## Should change this?
+      test_stat_var <- sum(2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF))/residual_variance ## Should change this? - no since RMW format U_STAT should be standardized by residual_variance
       test_stat <- test_stat_num/sqrt(test_stat_var)
       pval <-  2*stats::pnorm(-abs(test_stat)) #Looks like I get the right answer comparing to RAREMETAL output but do a more comprehensive look later
 
