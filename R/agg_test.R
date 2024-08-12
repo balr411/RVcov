@@ -91,6 +91,8 @@
 #' @importFrom stringr str_glue
 #' @importFrom dplyr anti_join
 #'
+#' @export agg_test
+#'
 #' @return 1 if RAREMETAL was performed using the estimated covariance successfully,
 #' 0 if two-stage approach was performed successfully but covariance did not need
 #' to be computed.
