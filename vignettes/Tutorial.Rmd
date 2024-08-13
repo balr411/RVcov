@@ -279,10 +279,14 @@ respectively. The pLOF + missense(narrow) -log10(p-values) are `r -log10(pLOF_na
 and `r -log10(pLOF_narrowMissense_res_insample$PVALUE)` respectively, both of 
 which are close to each other. The pLOF + missense(broad) -log10(p-values) are 
 `r -log10(pLOF_broadMissense_res$PVALUE)` and `r -log10(pLOF_broadMissense_res_insample$PVALUE)` 
-respectively, which are further apart. This is not unexpected, as the reference panel
+respectively, which are further apart, with the -log10(p-value) from using the
+African reference panel being larger. This is not unexpected, as the reference panel
 is both mismatched and small (<1000). We saw more discordance between -log10(p-values)
-using InPSYght African American reference panels  of size <1000 and in-sample UKBB 
-covariance in our paper. 
+using InPSYght African American reference panels of size <1000 and in-sample UKBB 
+covariance in our paper. This disconcordance is generally in the direction of the
+reference panel giving a more significant -log10(p-value), as the reference panel 
+does not capture as many of the variants and hence the majority of the covariance 
+is being set to 0. 
 
 ## Performing Rare-Variant Aggregation Testing Given Group Files
 
@@ -341,5 +345,6 @@ pLOF_broadMissense_res_userMask <- fread("user_supplied_groupFile_userMask3.meta
 print(pLOF_broadMissense_res_userMask)
 ```
 
-
+These are the same as the results when not supplying the group files but setting
+pLOF, pLOF_missenseNarrow, and pLOF_missenseBroad to TRUE. 
 
