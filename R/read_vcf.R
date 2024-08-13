@@ -38,7 +38,8 @@
 #' @importFrom dplyr anti_join
 #' @importFrom Matrix Matrix
 #' @importFrom Matrix as.matrix
-#' @importClassesFrom Matrix sparseMatrix
+#' @importClassesFrom Matrix dgCMatrix
+#' @importMethodsFrom Matrix is.na-methods
 #'
 #' @return A sparse genotype matrix with the genotypes of the individuals,
 #' colnames corresponding to the SNPs in format CHR:REF:ALT:POS, and rownames

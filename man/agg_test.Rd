@@ -35,11 +35,12 @@ the RAREMETALWORKER formatted score statistic file.}
 
 \item{vcf_file}{String containing the file path and name containing the VCF
 of the genotypes of the  set of individuals to be used as the reference
-panel. Note that the chromosome column must be in the format c{chr_number}.
-ie. c1 for chromosome 1.}
+panel.}
 
 \item{chr}{The chromosome number on which you want to perform the analysis.
-Must be in the format c{chr_number}. ie. c1 for chromosome 1.}
+Must be in the same format as in the CHROM column of the VCF. This could be
+for example c{chr_number}, chr{chr_number}, or {chr_number}. ie. c1, chr1, or 1
+for chromosome 1.}
 
 \item{burden}{Perform simple (unweighted) burden test? Must be TRUE or FALSE.
 Default = TRUE.}
