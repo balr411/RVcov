@@ -76,7 +76,7 @@ Now note that the phenotype was generated using the *NEB* gene on chromosome
 set **chr** to 2, **gene_start** to 151485339, and **gene_end** to 151734476. 
 
 ```{r}
-chr <- 2
+chr <- "c2"
 gene_start <- 151485339
 gene_end <- 151734476
 ```

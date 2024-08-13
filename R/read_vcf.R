@@ -15,8 +15,11 @@
 #' Must be in the format c{chr_number} or chr{chr_number}. ie. c1 or chr1 for
 #' chromosome 1.
 #'
+#' @param allele_freq_test Data frame from test set VCF containing
+#' the columns CHROM, POS, REF, ALT, AF, AC, U_STAT, PVAL, SNP
+#'
 #' @param allele_freq_reference Data frame from reference panel VCF containing
-#' the columns CHROM, POS, REF, ALT, AN, AC, AF
+#' the columns CHROM, POS, REF, ALT, AN, AC, AF, SNP
 #'
 #' @param original_snps A vector containing the SNPs that were in the original
 #' reference allele frequency file before filtering/matching to the test set
