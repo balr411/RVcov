@@ -20,6 +20,8 @@ library("data.table")
 library("stringr")
 ```
 
+## Performing Rare-Variant Aggregation Testing Using Annotation File
+
 In this vignette we will walk through an example of using the package on summary 
 statistics generated using 503 Europeans from 1000G and a reference panel 
 of 661 Africans from 1000G. A detailed description of how the data was generated 
@@ -97,7 +99,9 @@ two_stage_threshold <- 3
 ```
 
 
-Also included in this package is an annotation file distributed from 1000G. Note 
+Also included in this package is an annotation file distributed from 1000G. 
+So in this first section, we will supply our own annotation file and none of our
+own group files. In the second section we will supply our own group files. Note 
 that it is not in VEP format, and passing this annotation file directly to *agg_test()*
 will either cause an error or lead to unexpected behavior. Hence we will read in 
 the annotation file in this vignette, and change the columns so that they are in 
@@ -185,7 +189,11 @@ agg_test(score_stat_file, vcf_file, chr, burden, wburden,
                      hwe = 0.000001)
 ```
 
-The pLOF results should be available at pLOF.meta.burden.results. 
+Note that since the function returned a 1, at least one of the mask files passed the 
+two-stage threshold, and RAREMETAL was called for each of the tests and masks. 
+The pLOF results should hence be available at pLOF.meta.burden.results; the pLOF + missense(narrow)
+results should be available at pLOF_narrowMissense.meta.burden.results; the 
+pLOF + missense(broad) results should be available at pLOF_broadMissense.meta.burden.results
 
 ```{r}
 pLOF_res <- fread("pLOF.meta.burden.results", header = TRUE, data.table = FALSE)
@@ -193,5 +201,54 @@ print(pLOF_res)
 ```
 
 
+```{r}
+pLOF_narrowMissense_res <- fread("pLOF_narrowMissense.meta.burden.results", header = TRUE, data.table = FALSE)
+print(pLOF_narrowMissense_res)
+```
 
+
+```{r}
+pLOF_broadMissense_res <- fread("pLOF_broadMissense.meta.burden.results", header = TRUE, data.table = FALSE)
+print(pLOF_broadMissense_res)
+```
+
+Note that we should be able to also supply the actual VCF used to generate the 
+single-variant results. We would hope that the results using our external reference
+panel above would be similar to our results using the African reference panel. 
+This time we set two_stage to FALSE, and add a prefix to the RAREMETAL output 
+via specifying altRaremetalPath = "trueCovariance_".
+
+```{r}
+vcf_file <- "vignetteData/chr2.1000G.european_unrel.NEB.vcf.gz"
+agg_test(score_stat_file, vcf_file, chr, burden, wburden,
+                     SKAT, anno_file = NULL,
+                     anno = df_vep_anno, two_stage = FALSE, 
+                     two_stage_threshold = two_stage_threshold,
+                     group_file = NULL, pLOF = pLOF,
+                     pLOF_narrowMissense = pLOF_narrowMissense,
+                     pLOF_broadMissense = pLOF_broadMissense,
+                     altGroupFilePath = NULL, altCovariancePath = NULL,
+                     altRaremetalPath = "trueCovariance_", mafThreshold = 0.01, 
+                     gene = "NEB", gene_start = gene_start, gene_end = gene_end, 
+                     hwe = 0.000001)
+```
+
+
+
+```{r}
+pLOF_res <- fread("pLOF.meta.burden.results", header = TRUE, data.table = FALSE)
+print(pLOF_res)
+```
+
+
+```{r}
+pLOF_narrowMissense_res <- fread("pLOF_narrowMissense.meta.burden.results", header = TRUE, data.table = FALSE)
+print(pLOF_narrowMissense_res)
+```
+
+
+```{r}
+pLOF_broadMissense_res <- fread("pLOF_broadMissense.meta.burden.results", header = TRUE, data.table = FALSE)
+print(pLOF_broadMissense_res)
+```
 
