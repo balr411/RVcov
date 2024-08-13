@@ -17,7 +17,8 @@
 #'  ie. c1 for chromosome 1.
 #'
 #' @param chr The chromosome number on which you want to perform the analysis.
-#' Must be in the format c{chr_number}. ie. c1 for chromosome 1.
+#' Must be in the format c{chr_number} or chr{chr_number}. ie. c1 or chr1 for
+#' chromosome 1.
 #'
 #' @param burden Perform simple (unweighted) burden test? Must be TRUE or FALSE.
 #' Default = TRUE.
@@ -135,7 +136,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
     stop("VCF file doesn't exist!")
   }
 
-  allele_freq_reference <- generate_allele_frequency(vcf_file, chr, gene_start, gene_end)
+  allele_freq_reference <- generate_allele_frequency(vcf_file)
   dup_ref <- allele_freq_reference$POS[duplicated(allele_freq_reference$POS)]
 
   #Keep track of the variants orignially in the VCF in case the matrix is too

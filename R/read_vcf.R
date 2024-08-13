@@ -12,7 +12,8 @@
 #'  ie. c1 for chromosome 1.
 #'
 #' @param chr The chromosome number on which you want to perform the analysis.
-#' Must be in the format c{chr_number}. ie. c1 for chromosome 1.
+#' Must be in the format c{chr_number} or chr{chr_number}. ie. c1 or chr1 for
+#' chromosome 1.
 #'
 #' @param allele_freq_reference Data frame from reference panel VCF containing
 #' the columns CHROM, POS, REF, ALT, AN, AC, AF
@@ -42,7 +43,8 @@
 read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
                      original_snps, gene_start = NULL, gene_end = NULL){
 
-  chr_num <- as.numeric(unlist(strsplit(chr, split = "c"))[2])
+  chr_num <- gsub("c", "", chr)
+  chr_num <- as.numeric(gsub("hr", "", chr_num))
 
   if(is.null(gene_start) & is.null(gene_end)){
     gt_current <- readGT(file = vcf_file)
