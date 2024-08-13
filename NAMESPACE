@@ -2,6 +2,7 @@
 
 export(agg_test)
 importClassesFrom(Matrix,dgCMatrix)
+importClassesFrom(Matrix,sparseMatrix)
 importFrom(CompQuadForm,davies)
 importFrom(GenomicRanges,GRanges)
 importFrom(IRanges,IRanges)
@@ -16,4 +17,4 @@ importFrom(dplyr,anti_join)
 importFrom(stats,pnorm)
 importFrom(stringr,str_count)
 importFrom(stringr,str_glue)
-importMethodsFrom(Matrix,"is.na-methods")
+importMethodsFrom(Matrix,is.na)
