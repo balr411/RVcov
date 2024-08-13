@@ -20,7 +20,7 @@ library("data.table")
 library("stringr")
 ```
 
-## Performing Rare-Variant Aggregation Testing Using Annotation File
+## Performing Rare-Variant Aggregation Testing Given Annotation File
 
 In this vignette we will walk through an example of using the package on summary 
 statistics generated using 503 Europeans from 1000G and a reference panel 
@@ -212,7 +212,21 @@ pLOF_broadMissense_res <- fread("pLOF_broadMissense.meta.burden.results", header
 print(pLOF_broadMissense_res)
 ```
 
-Note that we should be able to also supply the actual VCF used to generate the 
+Note we can also access the weighted burden results by changing the 'burden' 
+to 'BBeta' in the file name, and the SKAT results by changing the 'burden' to 
+'SKAT_'.
+
+```{r}
+pLOF_broadMissense_res_BBeta <- fread("pLOF_broadMissense.meta.BBeta.results", header = TRUE, data.table = FALSE)
+print(pLOF_broadMissense_res_BBeta)
+```
+
+```{r}
+pLOF_broadMissense_res_SKAT <- fread("pLOF_broadMissense.meta.SKAT_.results", header = TRUE, data.table = FALSE)
+print(pLOF_broadMissense_res_SKAT)
+```
+
+Note that we are also able to supply the actual VCF used to generate the 
 single-variant results. We would hope that the results using our external reference
 panel above would be similar to our results using the African reference panel. 
 This time we set two_stage to FALSE, and add a prefix to the RAREMETAL output 
@@ -239,19 +253,93 @@ pLOF + missense(broad) results should be available at trueCovariance_pLOF_broadM
 
 
 ```{r}
-pLOF_res <- fread("trueCovariance_pLOF.meta.burden.results", header = TRUE, data.table = FALSE)
-print(pLOF_res)
+pLOF_res_insample <- fread("trueCovariance_pLOF.meta.burden.results", 
+                           header = TRUE, data.table = FALSE)
+print(pLOF_res_insample)
 ```
 
 
 ```{r}
-pLOF_narrowMissense_res <- fread("trueCovariance_pLOF_narrowMissense.meta.burden.results", header = TRUE, data.table = FALSE)
-print(pLOF_narrowMissense_res)
+pLOF_narrowMissense_res_insample <- fread("trueCovariance_pLOF_narrowMissense.meta.burden.results", 
+                                          header = TRUE, data.table = FALSE)
+print(pLOF_narrowMissense_res_insample)
 ```
 
 
 ```{r}
-pLOF_broadMissense_res <- fread("trueCovariance_pLOF_broadMissense.meta.burden.results", header = TRUE, data.table = FALSE)
-print(pLOF_broadMissense_res)
+pLOF_broadMissense_res_insample <- fread("trueCovariance_pLOF_broadMissense.meta.burden.results", 
+                                         header = TRUE, data.table = FALSE)
+print(pLOF_broadMissense_res_insample)
 ```
+
+As expected, the results using the African reference panel compared to the in-sample
+covariance are quite similar for the pLOF and pLOF + missense(narrow) masks. The 
+pLOF -log10(p-values) are `r -log10(pLOF_res$PVALUE)` and `r -log10(pLOF_res_insample$PVALUE)`
+respectively. The pLOF + missense(narrow) -log10(p-values) are `r -log10(pLOF_narrowMissense_res$PVALUE)` 
+and `r -log10(pLOF_narrowMissense_res_insample$PVALUE)` respectively, both of 
+which are close to each other. The pLOF + missense(broad) -log10(p-values) are 
+`r -log10(pLOF_broadMissense_res$PVALUE)` and `r -log10(pLOF_broadMissense_res_insample$PVALUE)` 
+respectively, which are further apart. This is not unexpected, as the reference panel
+is both mismatched and small (<1000). We saw more discordance between -log10(p-values)
+using InPSYght African American reference panels  of size <1000 and in-sample UKBB 
+covariance in our paper. 
+
+## Performing Rare-Variant Aggregation Testing Given Group Files
+
+A second option to using *agg_test()* is to supply a vector of strings containing
+the file names of already created group files. Since *agg_test()* needs to write 
+the group files before calling RAREMETAL, we can use the three masks created above
+to show this. Let us use the African reference panel again, and skip using the 
+two-stage approach. We set pLOF, pLOF_narrowMissense, and pLOF_broadMissense all 
+to FALSE. If desired, they could be left to TRUE, and RAREMETAL will be run for
+those 3 mask definitions as well as the user-supplied group files (which in this 
+case are the same, and hence each test would be performed twice).
+
+```{r}
+vcf_file <- "vignetteData/chr2.1000G.african_unrel.NEB.vcf.gz"
+
+group_file <- c("NEB.pLOF.group.file", 
+               "NEB.pLOF_narrowMissense.group.file",
+               "NEB.pLOF_broadMissense.group.file")
+
+altRaremetalPath <- "user_supplied_groupFile_"
+
+agg_test(score_stat_file, vcf_file, chr, burden, wburden,
+                     SKAT, anno_file = NULL,
+                     anno = df_vep_anno, two_stage = FALSE, 
+                     two_stage_threshold = two_stage_threshold,
+                     group_file = group_file, pLOF = FALSE,
+                     pLOF_narrowMissense = FALSE,
+                     pLOF_broadMissense = FALSE,
+                     altGroupFilePath = NULL, altCovariancePath = NULL,
+                     altRaremetalPath = NULL, mafThreshold = 0.01, gene = "NEB",
+                     gene_start = gene_start, gene_end = gene_end, 
+                     hwe = 0.000001)
+```
+
+In this case pLOF results will be at user_supplied_groupFile_userMask1.meta.burden.results;
+pLOF + missense(narrow) results will be at user_supplied_groupFile_userMask2.meta.burden.results;
+and pLOF + missense(broad) results will be auser_supplied_groupFile_userMask3.meta.burden.results
+
+```{r}
+pLOF_res_userMask <- fread("user_supplied_groupFile_userMask1.meta.burden.results", 
+                           header = TRUE, data.table = FALSE)
+print(pLOF_res_userMask)
+```
+
+
+```{r}
+pLOF_narrowMissense_res_userMask <- fread("user_supplied_groupFile_userMask2.meta.burden.results", 
+                                          header = TRUE, data.table = FALSE)
+print(pLOF_narrowMissense_res_userMask)
+```
+
+
+```{r}
+pLOF_broadMissense_res_userMask <- fread("user_supplied_groupFile_userMask3.meta.burden.results", 
+                                         header = TRUE, data.table = FALSE)
+print(pLOF_broadMissense_res_userMask)
+```
+
+
 
