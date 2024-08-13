@@ -312,7 +312,7 @@ agg_test(score_stat_file, vcf_file, chr, burden, wburden,
                      pLOF_narrowMissense = FALSE,
                      pLOF_broadMissense = FALSE,
                      altGroupFilePath = NULL, altCovariancePath = NULL,
-                     altRaremetalPath = NULL, mafThreshold = 0.01, gene = "NEB",
+                     altRaremetalPath = altRaremetalPath, mafThreshold = 0.01, gene = "NEB",
                      gene_start = gene_start, gene_end = gene_end, 
                      hwe = 0.000001)
 ```
