@@ -185,7 +185,12 @@ agg_test(score_stat_file, vcf_file, chr, burden, wburden,
                      hwe = 0.000001)
 ```
 
+The pLOF results should be available at pLOF.meta.burden.results. 
 
+```{r}
+pLOF_res <- fread("pLOF.meta.burden.results", header = TRUE, data.table = FALSE)
+print(pLOF_res)
+```
 
 
 
