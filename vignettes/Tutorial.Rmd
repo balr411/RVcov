@@ -42,7 +42,8 @@ to 3.
 Either **group_file**: Vector of strings containing the file paths and names of
 the group files to perform the rare-variant aggregation tests with. Or: at least 
 one of **pLOF**, **pLOF_narrowMissense**, or **pLOF_broadMissense** to be set to 
-TRUE. If the latter is used, we also need to specify **anno_file** or **anno**: 
+TRUE. If the latter is used, we also need to specify **gene**: the name of the 
+gene we want to use, and **anno_file** or **anno**: 
 The former being the file name and path to a VEP annotation 
 file, the latter being an annotation file in VEP output format that has already 
 been read into R. 
@@ -155,10 +156,12 @@ df_vep_anno <- data.frame(PICK = rep(1, nrow(df_anno)),
 head(df_vep_anno)
 ```
 
-And as stated already, we will use all 3 annotation definitions for our masks: 
+And as stated already, we will use all 3 annotation definitions for our masks and
+we are using the *NEB* gene: 
 
 ```{r}
 pLOF <- pLOF_narrowMissense <- pLOF_broadMissense <- TRUE
+gene <- "NEB"
 ```
 
 Now that we have put together all of the required parameters, we can call *agg_test()*:
@@ -172,7 +175,7 @@ agg_test(score_stat_file, vcf_file, chr, burden, wburden,
                      pLOF_narrowMissense = pLOF_narrowMissense,
                      pLOF_broadMissense = pLOF_broadMissense,
                      altGroupFilePath = NULL, altCovariancePath = NULL,
-                     altRaremetalPath = NULL, mafThreshold = 0.01, gene = NULL,
+                     altRaremetalPath = NULL, mafThreshold = 0.01, gene = "NEB",
                      gene_start = gene_start, gene_end = gene_end, 
                      hwe = 0.000001)
 ```
