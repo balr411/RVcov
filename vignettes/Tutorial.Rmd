@@ -123,7 +123,9 @@ to 1 for all variants since this filtering step should have already been done by
 
 **Uploaded_variation**: A column containing the variant in the format CHROM:POS:REF:ALT.
 
-**Consequence**: The predicted consequence of the variant.
+**Consequence**: The predicted consequence of the variant. If there are multiple
+consequences, they must be separated by commas. Note that the consequences in the 
+1000G data are separated by '&', and must be changed first.
 
 **LRT_pred**: The LRT deleteriousness prediction for the variant. Note that the 
 1000G annotation file does not contain LRT predictions, so we will set this to "D"
@@ -143,6 +145,8 @@ only SIFT predictions so we will use those in place of SIFT4G predictions.
 We can easily create a new data frame with only those columns:
 
 ```{r}
+df_anno$EFFECT <- gsub("&", ",", df_anno$EFFECT, fixed = TRUE) #Put in VEP format
+
 df_vep_anno <- data.frame(PICK = rep(1, nrow(df_anno)),
                           Uploaded_variation = paste(2, df_anno$POS, df_anno$REF, df_anno$ALT, sep = ":"),
                           Consequence = df_anno$EFFECT,

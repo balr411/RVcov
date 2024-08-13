@@ -13,12 +13,12 @@
 #'
 #' @param vcf_file String containing the file path and name containing the VCF
 #'  of the genotypes of the  set of individuals to be used as the reference
-#'  panel. Note that the chromosome column must be in the format c{chr_number}.
-#'  ie. c1 for chromosome 1.
+#'  panel.
 #'
 #' @param chr The chromosome number on which you want to perform the analysis.
-#' Must be in the format c{chr_number} or chr{chr_number}. ie. c1 or chr1 for
-#' chromosome 1.
+#' Must be in the same format as in the CHROM column of the VCF. This could be
+#' for example c{chr_number}, chr{chr_number}, or {chr_number}. ie. c1, chr1, or 1
+#' for chromosome 1.
 #'
 #' @param burden Perform simple (unweighted) burden test? Must be TRUE or FALSE.
 #' Default = TRUE.
@@ -121,6 +121,10 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
 
   names(allele_freq_test) <- c("CHROM", "POS", "REF", "ALT", "AF", "AC",
                                "U_STAT", "PVAL")
+
+  #Make sure CHROM is in format {num} and not c{num} or chr{num}
+  allele_freq_test$CHROM <- gsub("c", "", allele_freq_test$CHROM)
+  allele_freq_test$CHROM <- as.numeric(gsub("hr", "", allele_freq_test$CHROM))
 
   #Delete multi-alleleic variants
   allele_freq_test <- dplyr::anti_join(allele_freq_test, allele_freq_test[duplicated(allele_freq_test$POS),], by = "POS")

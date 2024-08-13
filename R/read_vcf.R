@@ -38,6 +38,7 @@
 #' @importFrom dplyr anti_join
 #' @importFrom Matrix Matrix
 #' @importFrom Matrix as.matrix
+#' @importClassesFrom Matrix sparseMatrix
 #'
 #' @return A sparse genotype matrix with the genotypes of the individuals,
 #' colnames corresponding to the SNPs in format CHR:REF:ALT:POS, and rownames
@@ -46,16 +47,15 @@
 read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
                      original_snps, gene_start = NULL, gene_end = NULL){
 
-  chr_num <- gsub("c", "", chr)
-  chr_num <- as.numeric(gsub("hr", "", chr_num))
 
   if(is.null(gene_start) & is.null(gene_end)){
-    gt_current <- readGT(file = vcf_file)
+    gt_current <- VariantAnnotation::readGT(file = vcf_file)
   }else if((is.null(gene_start) & !is.null(gene_end)) | (!is.null(gene_start) & is.null(gene_end))){
     stop("Only one gene boundary given.")
   }else{
-    current_range <- ScanVcfParam(which = GRanges(seqnames = S4Vectors::Rle(chr_num), ranges = IRanges(start = gene_start, end = gene_end)))
-    gt_current <- readGT(file = vcf_file, param = current_range)
+    current_range <- VariantAnnotation::ScanVcfParam(which = GenomicRanges::GRanges(seqnames = S4Vectors::Rle(chr),
+                                                                                    ranges = IRanges::IRanges(start = gene_start, end = gene_end)))
+    gt_current <- VariantAnnotation::readGT(file = vcf_file, param = current_range)
   }
 
   gt_current <- t(gt_current)
@@ -80,6 +80,9 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
     gt_current[gt_current %in% c("0/0", "0|0")] <- 0
     gt_current[gt_current %in% c("0/1", "1/0", "0|1", "1|0")] <- 1
     gt_current[gt_current %in% c("1/1", "1|1")] <- 2
+
+    #Put all missing values in as 3
+    #gt_current[!(gt_current %in% c(0,1,2))] <- 3
 
     n_row <- nrow(gt_current)
     n_col <- ncol(gt_current)

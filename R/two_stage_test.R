@@ -77,7 +77,7 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
                                         h = rep(1, length(eigen_vals)),
                                         delta = rep(0, length(eigen_vals))) #Need to test this when cluster back online
 
-      if(-log10(pval_SKAT) > two_stage_threshold){
+      if(-log10(pval_SKAT$Qq) > two_stage_threshold){
         to_return <- TRUE
         break
       }
