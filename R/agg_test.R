@@ -223,11 +223,15 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
 
   #If necessary, calculate covariance using external reference panel and perform RAREMETAL
   if(calculate_covariance){
+    #Add SNP column
+    allele_freq_test$SNP <-  paste(allele_freq_test$CHROM, allele_freq_test$POS, allele_freq_test$REF, allele_freq_test$ALT, sep = ":")
+    allele_freq_reference$SNP <- paste(allele_freq_reference$CHROM,  allele_freq_reference$POS, allele_freq_reference$REF, allele_freq_reference$ALT, sep = ":")
+
     #Now make sure to match based on SNP and not position (and fix allele switches)
     #First match on position
     allele_freq_reference <- allele_freq_reference[allele_freq_reference$POS %in% allele_freq_test$POS,]
 
-    #Create copy of test allele freq that only contains the variants from the reference panel
+    #Create copy of test allele freq that only contains the variants from the reference panel - ########################
     allele_freq_test_red_temp <- allele_freq_test[allele_freq_test$POS %in% allele_freq_reference$POS,]
 
     ###############################################################################
@@ -241,18 +245,23 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
     if(length(idx_switched) > 0){
       allele_freq_reference$ALLELE_SWITCH[idx_switched] <- 1
 
+      #Change the switched alleles in original_vars
+      idx_switched_ov <- which(original_snps %in% allele_freq_reference$SNP[idx_switched])
+
       #Fix the allele switches
       allele_freq_reference$REF[idx_switched] <- allele_freq_test_red_temp$REF[idx_switched]
       allele_freq_reference$ALT[idx_switched] <- allele_freq_test_red_temp$ALT[idx_switched]
 
       allele_freq_reference$AC[idx_switched] <- allele_freq_reference$AN[idx_switched] - allele_freq_reference$AC[idx_switched]
       allele_freq_reference$AF[idx_switched] <- 1 - allele_freq_reference$AF[idx_switched]
+
+      #Update SNP column again
+      allele_freq_reference$SNP <- paste(allele_freq_reference$CHROM,  allele_freq_reference$POS, allele_freq_reference$REF, allele_freq_reference$ALT, sep = ":")
+
+      original_snps[idx_switched_ov] <- allele_freq_reference$SNP[idx_switched]
     }
 
     #Now match based on SNP
-    allele_freq_test$SNP <-  paste(allele_freq_test$CHROM, allele_freq_test$POS, allele_freq_test$REF, allele_freq_test$ALT, sep = ":")
-    allele_freq_reference$SNP <- paste(allele_freq_reference$CHROM,  allele_freq_reference$POS, allele_freq_reference$REF, allele_freq_reference$ALT, sep = ":")
-
     allele_freq_reference <- allele_freq_reference[allele_freq_reference$SNP %in% allele_freq_test$SNP,]
 
     #Note that here the dimension of the reference allele frequency data frame must be

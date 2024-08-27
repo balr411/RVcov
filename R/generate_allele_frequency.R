@@ -13,7 +13,7 @@
 
 generate_allele_frequency <- function(vcf_file){
   #Note have to add functionality for gene_start and gene_end later
-  cm <- stringr::str_glue("bcftools +fill-AN-AC {vcf_file} | bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t%AN\\t%AC\\n'")
+  cm <- stringr::str_glue("bcftools +fill-AN-AC {vcf_file} | bcftools query -f '%CHROM\\t%POS\\t%REF\\t%ALT\\t%AN\\t%AC\\n'") #Need to add functionality for gene_start and gene_end
   af <- system(cm, intern = TRUE)
 
   #Create data frame from the vector

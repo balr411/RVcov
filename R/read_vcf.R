@@ -63,6 +63,7 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
   id_names <- rownames(gt_current)
 
   #Keep only single-allelic variants that are in the test set - here I think we should be doing it from the reference set since we matched based on SNP not pos
+  #Note there is an issue here since the original SNPs had not yet been altered for allele switching
   gt_current <- gt_current[,original_snps %in% allele_freq_reference$SNP, drop = FALSE] # Note there could be no variants shared between the test and reference
 
   #Now switch the entries for the alleles that had switched alleles
@@ -72,7 +73,6 @@ read_vcf <- function(vcf_file, chr, allele_freq_test, allele_freq_reference,
     gt_current[,idx_gt_switched][gt_current[,idx_gt_switched] %in% c("0/0", "0|0")] <- 2
     gt_current[,idx_gt_switched][gt_current[,idx_gt_switched] %in% c("1/1", "1|1")] <- 0
   }
-
 
   if(dim(gt_current)[2] > 0){ #Should be >= 1 variant in the gene
     allele_freq_reference_temp <- allele_freq_reference
