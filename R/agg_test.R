@@ -69,6 +69,11 @@
 #' @param altRaremetalPath Optional alternative path to write RAREMETAL results
 #' to. Default = NULL. If left as NULL, will write in current directory.
 #'
+#' @param altRaremetalName Optional command to call RAREMETAL with. For example if
+#' you have multiple RAREMETAL installations and want to use a specific one, please
+#' give the path + name of the executable file for the installation you want to use.
+#' Default = NULL.
+#'
 #' @param mafThreshold If pLOF, pLOF_narrowMissense, or pLOF_broadMissense
 #'  are TRUE, threshold for including variants in group file. Note here
 #'  we assume that the alternate allele is coded as the minor allele.
@@ -106,7 +111,8 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
                      group_file = NULL, pLOF = FALSE,
                      pLOF_narrowMissense = FALSE, pLOF_broadMissense = FALSE,
                      altGroupFilePath = NULL, altCovariancePath = NULL,
-                     altRaremetalPath = NULL, mafThreshold = 0.01, gene = NULL,
+                     altRaremetalPath = NULL, altRaremetalName = NULL,
+                     mafThreshold = 0.01, gene = NULL,
                      gene_start = NULL, gene_end = NULL, hwe = 0.000001){
 
   #Add checks here to make sure bcftools, RAREMETAL, and tabix are installed
@@ -282,7 +288,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
     #Call RAREMETAL
     call_raremetal(mask_list, score_stat_file, file_paths, burden, wburden, SKAT,
                    altCovariancePath, altGroupFilePath, altRaremetalPath, gene,
-                   hwe) #Have to check what happens if RAREMETAL does not run successfully
+                   hwe, altRaremetalName) #Have to check what happens if RAREMETAL does not run successfully
 
     to_return <- 1
   }else{

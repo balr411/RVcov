@@ -34,16 +34,23 @@
 #'
 #' @param hwe Hardy-Weinberg equilibrium p-value cut-off. Default = 0.000001.
 #'
+#' @param altRaremetalName Optional command to call RAREMETAL with. For example if
+#' you have multiple RAREMETAL installations and want to use a specific one, please
+#' give the path + name of the executable file for the installation you want to use.
+#' Default = NULL.
+#'
 #' @importFrom stringr str_glue
 #'
 #' @return Nothing. Will write the RAREMETAL results to
-#' altRaremetalPath/gene.mask_name.burden.res - ??
+#' altRaremetalPath/gene.mask_name.meta.burden.results for burden,
+#' altRaremetalPath/gene.mask_name.meta.BBeta.results for weighted burden,
+#' and altRaremetalPath/gene.mask_name.meta.SKAT_.results for SKAT
 
 call_raremetal <- function(mask_list, score_stat_file, group_file_names,
                            burden, wburden, SKAT,
                            altCovariancePath = NULL, altGroupFilePath = NULL,
                            altRaremetalPath = NULL, gene = 'gene',
-                           hwe = 0.000001){
+                           hwe = 0.000001, altRaremetalName = NULL){
 
   #First write temporary covFiles and scoreFiles to pass to RAREMETAL
   #scoreFiles first
@@ -88,18 +95,24 @@ call_raremetal <- function(mask_list, score_stat_file, group_file_names,
       full_prefix <- paste0(altRaremetalPath, group_file_curr_name)
     }
 
+    if(!is.null(altRaremetalName)){
+      raremetal <- altRaremetalName
+    }else{
+      raremetal <- "raremetal"
+    }
+
     if(burden & !wburden &!SKAT){
-      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --maf 1 --hwe {hwe} --prefix {full_prefix}")
+      cm <- str_glue("{raremetal} --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }else if(!burden & wburden & !SKAT){
-      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --BBeta --maf 1 --hwe {hwe} --prefix {full_prefix}")
+      cm <- str_glue("{raremetal} --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --BBeta --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }else if(!burden & !wburden & SKAT){
-      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+      cm <- str_glue("{raremetal} --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }else if(burden & wburden & !SKAT){
-      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --BBeta --maf 1 --hwe {hwe} --prefix {full_prefix}")
+      cm <- str_glue("{raremetal} --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --BBeta --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }else if(burden & !wburden & SKAT){
-      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+      cm <- str_glue("{raremetal} --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }else if(!burden & wburden & SKAT){
-      cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --BBeta --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
+      cm <- str_glue("{raremetal} --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --BBeta --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }else{
       cm <- str_glue("raremetal --summaryFiles {summary_files} --covFiles {cov_files} --groupFile {group_file_curr} --burden --BBeta --SKAT --maf 1 --hwe {hwe} --prefix {full_prefix}")
     }

@@ -58,7 +58,10 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
     }
 
     if(wburden){
-      weights_curr <- dbeta(allele_freq_test_temp$AF, 1, 25)
+      MAF_weights <- allele_freq_test_temp$AF
+      f0 <- 2/sample_size
+      MAF_weights[MAF_weights < f0] <- f0
+      weights_curr <- dbeta(MAF_weights, 1, 25)
       test_stat_num_wb <- sum(weights_curr * allele_freq_test_temp$U_STAT)
       test_stat_var_wb <- sum(weights_curr^2 * (2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF)))/residual_variance
       test_stat_wb <- test_stat_num_wb/sqrt(test_stat_var_wb)
@@ -71,11 +74,15 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
     }
 
     if(SKAT){
-      test_stat_num_SKAT <- sum(allele_freq_test_temp$U_STAT^2)/residual_variance^2
-      eigen_vals <- 2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF)
-      pval_SKAT <- CompQuadForm::davies(test_stat_num_SKAT, lambda = eigen_vals,
-                                        h = rep(1, length(eigen_vals)),
-                                        delta = rep(0, length(eigen_vals))) #Need to test this when cluster back online
+      MAF_weights <- allele_freq_test_temp$AF
+      f0 <- 2/sample_size
+      MAF_weights[MAF_weights < f0] <- f0
+      weights_curr <- dbeta(MAF_weights, 1, 25)^2
+      test_stat_num_SKAT <- sum(weights_curr * allele_freq_test_temp$U_STAT^2)
+      eigen_vals <- 2*weights_curr*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF)/residual_variance
+      pval_SKAT <- CompQuadForm::liu(test_stat_num_SKAT, lambda = eigen_vals,
+                                     h = rep(1, length(eigen_vals)),
+                                     delta = rep(0, length(eigen_vals)))
 
       if(-log10(pval_SKAT$Qq) > two_stage_threshold){
         to_return <- TRUE
