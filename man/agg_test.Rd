@@ -22,6 +22,7 @@ agg_test(
   altGroupFilePath = NULL,
   altCovariancePath = NULL,
   altRaremetalPath = NULL,
+  altRaremetalName = NULL,
   mafThreshold = 0.01,
   gene = NULL,
   gene_start = NULL,
@@ -90,6 +91,11 @@ in current directory.}
 
 \item{altRaremetalPath}{Optional alternative path to write RAREMETAL results
 to. Default = NULL. If left as NULL, will write in current directory.}
+
+\item{altRaremetalName}{Optional command to call RAREMETAL with. For example if
+you have multiple RAREMETAL installations and want to use a specific one, please
+give the path + name of the executable file for the installation you want to use.
+Default = NULL.}
 
 \item{mafThreshold}{If pLOF, pLOF_narrowMissense, or pLOF_broadMissense
 are TRUE, threshold for including variants in group file. Note here

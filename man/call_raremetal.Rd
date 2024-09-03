@@ -15,7 +15,8 @@ call_raremetal(
   altGroupFilePath = NULL,
   altRaremetalPath = NULL,
   gene = "gene",
-  hwe = 1e-06
+  hwe = 1e-06,
+  altRaremetalName = NULL
 )
 }
 \arguments{
@@ -49,10 +50,17 @@ to. Default = NULL. If left as NULL, will write in current directory.}
 Default = 'gene'.}
 
 \item{hwe}{Hardy-Weinberg equilibrium p-value cut-off. Default = 0.000001.}
+
+\item{altRaremetalName}{Optional command to call RAREMETAL with. For example if
+you have multiple RAREMETAL installations and want to use a specific one, please
+give the path + name of the executable file for the installation you want to use.
+Default = NULL.}
 }
 \value{
 Nothing. Will write the RAREMETAL results to
-altRaremetalPath/gene.mask_name.burden.res - ??
+altRaremetalPath/gene.mask_name.meta.burden.results for burden,
+altRaremetalPath/gene.mask_name.meta.BBeta.results for weighted burden,
+and altRaremetalPath/gene.mask_name.meta.SKAT_.results for SKAT
 }
 \description{
 A function that performs simple burden testing by making a call

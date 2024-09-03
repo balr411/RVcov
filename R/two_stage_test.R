@@ -26,7 +26,7 @@
 #' @importFrom data.table fread
 #' @importFrom stringr str_glue
 #' @importFrom stats pnorm
-#' @importFrom CompQuadForm davies
+#' @importFrom CompQuadForm liu
 #'
 #' @return TRUE/FALSE to compute covariance or not if at least one of the masks
 #' passes the -log10(p-value) threshold
@@ -84,7 +84,7 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
                                      h = rep(1, length(eigen_vals)),
                                      delta = rep(0, length(eigen_vals)))
 
-      if(-log10(pval_SKAT$Qq) > two_stage_threshold){
+      if(-log10(pval_SKAT) > two_stage_threshold){
         to_return <- TRUE
         break
       }
