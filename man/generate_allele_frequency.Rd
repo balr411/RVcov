@@ -4,12 +4,25 @@
 \alias{generate_allele_frequency}
 \title{Generate a data frame with allele frequencies from VCF}
 \usage{
-generate_allele_frequency(vcf_file)
+generate_allele_frequency(vcf_file, chr, gene_start = NULL, gene_end = NULL)
 }
 \arguments{
 \item{vcf_file}{String containing the file path and name containing the VCF
 of the genotypes of the  set of individuals to be used as the reference
 panel.}
+
+\item{chr}{The chromosome number on which you want to perform the analysis.
+Must be in the same format as in the CHROM column of the VCF. This could be
+for example c{chr_number}, chr{chr_number}, or {chr_number}. ie. c1, chr1, or 1
+for chromosome 1.}
+
+\item{gene_start}{The starting base pair position of the gene on the chromosome.
+Default = NULL. If you have large reference panel VCFs it is recommended to
+supply gene_start and gene_end.}
+
+\item{gene_end}{The ending base pair position of the gene on the chromosome.
+Default = NULL. If you have large reference panel VCFs it is recommended to
+supply gene_start and gene_end.}
 }
 \value{
 A data frame with columns CHROM, POS, REF, ALT, AN, AC, AF
