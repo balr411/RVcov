@@ -283,7 +283,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
 
     #Compute covariance
     compute_covariance(gt, allele_freq_test, n, resid_var,
-                       altCovariancePath, gene) #currently not getting the same with InPSYght so check this
+                       altCovariancePath, gene)
 
     #Call RAREMETAL
     call_raremetal(mask_list, score_stat_file, file_paths, burden, wburden, SKAT,

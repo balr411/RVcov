@@ -1,0 +1,54 @@
+#Download the tabix files for the annotation VCF as well as the VCF with the genotypes
+curl -OJL https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_raw_GT_with_annot/20201028_CCDG_14151_B01_GRM_WGS_2020-08-05_chr2.recalibrated_variants.annotated.vcf.gz.tbi
+curl -OJL https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_raw_GT_with_annot/20201028_CCDG_14151_B01_GRM_WGS_2020-08-05_chr2.recalibrated_variants.vcf.gz.tbi
+
+#Create an allele frequency file with all of the desired headers
+#Note most of the predictions are in the rare annotation file so just get a normal allele frequency file and then take the annotations from the other file 
+#bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t%ALLELE\t%EFFECT\t%IMPACT\t%GENE\t%GENEID\t%LOF\t%MutationAssessor_pred\t%MutationTaster_pred\t%Polyphen2_HVAR_pred\t%Polyphen2_HDIV_pred\t%SIFT_pred\n' https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_raw_GT_with_annot/20201028_CCDG_14151_B01_GRM_WGS_2020-08-05_chr2.recalibrated_variants.annotated.vcf.gz > chr2.1000G.allele.freq
+
+bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%AF\n' https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_raw_GT_with_annot/20201028_CCDG_14151_B01_GRM_WGS_2020-08-05_chr2.recalibrated_variants.annotated.vcf.gz | gzip > chr2.1000G.allele.freq.gz 
+
+#Download the rare-variant annotation file 
+curl -OJL https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_raw_GT_with_annot/20201028_CCDG_14151_B01_GRM_WGS_2020-08-05_chr2.recalibrated_variants.annotated.coding_rare.txt
+
+#Use the script 1000G_rareVariant_pruning.R to get a reduced rare-variant annotation data frame output for NEB gene "chr2.1000G.NEB.rare_variants.annotation.txt"
+#The gene has boundaries 151485339-151734476 on NCBI (https://www.ncbi.nlm.nih.gov/gene?Db=gene&Cmd=DetailsSearch&Term=4703) and all variants listed in NEB
+#gene in the annotation file fall between these boundaries 
+
+#Hence download the VCF from 1000G in this range 
+tabix -h https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_raw_GT_with_annot/20201028_CCDG_14151_B01_GRM_WGS_2020-08-05_chr2.recalibrated_variants.vcf.gz chr2:151485339-151734476 | bcftools view -Oz > NEB/chr2.1000G.full.NEB.vcf.gz
+
+#Reduce the annotation file to only include variants in NEB 
+zcat chr2.1000G.allele.freq.gz | awk '$2 >= 151485339 && $2 <= 151734476' | gzip > NEB/chr2.1000G.NEB.allele.freq.gz
+
+#Now remove the related samples and split the VCF into a reference panel of 1,000 and a test set containing everybody else
+#Download the pedigree information 
+curl -OJL http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/1kGP.3202_samples.pedigree_info.txt
+
+#Download file containing the ancestries of the unrelateds
+curl -OJL http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/1000G_2504_high_coverage.sequence.index 
+
+#Use R script 1000G_unrelated_samples.R to create a file containing the unrelated European samples and a file containing the unrelated African samples
+#Then create two NEB VCFs - one containing only European samples and one containing only African samples
+bcftools view -Oz --samples-file european_unrelateds.txt NEB/chr2.1000G.full.NEB.vcf.gz > NEB/chr2.1000G.european_unrel.NEB.vcf.gz
+tabix -p vcf NEB/chr2.1000G.european_unrel.NEB.vcf.gz
+
+bcftools view -Oz --samples-file african_unrelateds.txt NEB/chr2.1000G.full.NEB.vcf.gz > NEB/chr2.1000G.african_unrel.NEB.vcf.gz
+tabix -p vcf NEB/chr2.1000G.african_unrel.NEB.vcf.gz
+
+#Create an allele frequency file for each of the vcfs
+bcftools +fill-AN-AC NEB/chr2.1000G.european_unrel.NEB.vcf.gz | bcftools query -f' %CHROM\t%POS\t%REF\t%ALT\t%AN\t%AC\n' | gzip > NEB/chr2.1000G.NEB.european_unrel.allele.freq.gz
+
+bcftools +fill-AN-AC NEB/chr2.1000G.african_unrel.NEB.vcf.gz | bcftools query -f' %CHROM\t%POS\t%REF\t%ALT\t%AN\t%AC\n' | gzip > NEB/chr2.1000G.NEB.african_unrel.allele.freq.gz
+
+#Now run 1000G_simulate_phenotype to output the .ped file (NEB/simulated_phenotype.ped)
+#Manually created the .dat file (NEB/simulated_phenotype.dat)
+
+#Now change directory to NEB/ and run RAREMETALWORKER
+/net/snowwhite/home/welchr/projects/raremetal/build/release/bin/raremetalworker --ped simulated_phenotype.ped --dat simulated_phenotype.dat --vcf chr2.1000G.european_unrel.NEB.vcf.gz --traitname Phenotype --inverseNormal --makeResiduals --prefix NEB.european
+
+#The final score statistic file can be found at NEB.european.Phenotype.singlevar.score.txt.gz
+
+
+
+

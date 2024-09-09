@@ -25,7 +25,8 @@ library("stringr")
 In this vignette we will walk through an example of using the package on summary 
 statistics generated using 503 Europeans from 1000G and a reference panel 
 of 661 Africans from 1000G. A detailed description of how the data was generated 
-can be found in the README file. To perform aggregation testing, we need to pass
+can be found in the README file in the extdata/ folder. 
+To perform aggregation testing, we need to pass
 at a minimum the following parameters to the function *agg_test()*:
 
 **score_stat_file**: The file name and path of the score statistic file.
