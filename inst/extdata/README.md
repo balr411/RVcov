@@ -32,10 +32,10 @@ We used the following process to generate the summary statistic data:
 
 6.  To ensure some truly associated variants, we set nh<sup>2</sup>
     = 50. Since n = 503, this meant assigning h<sup>2</sup> = 0.0994. We
-    then calculate the proportionality constant for the true effect
+    then calculated the proportionality constant for the true effect
     sizes.
 
 7.  We simulated the phenotype from a normal distribution with mean
     equal to the linear combination of the true effect size and
-    individual level genotype, and the variance equal to
+    individual level genotypes, and the variance equal to
     1-h<sup>2</sup>.

@@ -10,7 +10,9 @@ to serve as an external reference panel. The agg_test() function will estimate
 the covariance of the score statistics using the VCF from the external reference 
 panel and can perform various rare-variant aggregation tests using this estimated 
 covariance. Options to supply either VEP annotation files or user-made RAREMETAL 
-formatted group files.
+formatted group files. Option also to perform the two-stage approach whereby covariance
+is estimated only when using the null covariance gives a -log10(p-value) above some 
+threshold (default to 3). 
 
 A tutorial of using the package can be found in the vignettes. After package installation,
 a copy of the data 
@@ -26,6 +28,8 @@ installed tabix, RAREMETAL, and BCFtools. The tabix and BCFtools must be able to
 be called using the commands tabix and bcftools respectively. By default we assume
 RAREMETAL can be called using the command raremetal but there is an option to supply
 an alternate path/name to call raremetal.
+
+A detailed explanation of our method is available in our paper: (insert paper link eventually)
 
 ## Installation
 
