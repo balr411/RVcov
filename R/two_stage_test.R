@@ -61,7 +61,7 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
       MAF_weights <- allele_freq_test_temp$AF
       f0 <- 2/sample_size
       MAF_weights[MAF_weights < f0] <- f0
-      weights_curr <- dbeta(MAF_weights, 1, 25)
+      weights_curr <- dbeta(MAF_weights, 1, 25)^2
       test_stat_num_wb <- sum(weights_curr * allele_freq_test_temp$U_STAT)
       test_stat_var_wb <- sum(weights_curr^2 * (2*sample_size*allele_freq_test_temp$AF*(1-allele_freq_test_temp$AF)))/residual_variance
       test_stat_wb <- test_stat_num_wb/sqrt(test_stat_var_wb)
