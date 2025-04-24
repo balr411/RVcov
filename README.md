@@ -1,10 +1,10 @@
 
-# externalCov
+# RVcov
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of externalCov is to perform rare-variant aggregation testing when users have
+The goal of RVcov is to perform rare-variant aggregation testing when users have
 RAREMETALWORKER formatted summary statistics and a VCF containing a set of individuals
 to serve as an external reference panel. The agg_test() function will estimate 
 the covariance of the score statistics using the VCF from the external reference 
@@ -35,7 +35,7 @@ A detailed explanation of our method is available in our paper: (insert paper li
 
 Note that our package requires the VariantAnnotation package to be installed 
 and is not installed automatically. You can install both VariantAnnotation and 
-the development version of externalCov from [GitHub](https://github.com/balr411) with:
+the development version of RVcov from [GitHub](https://github.com/balr411) with:
 
 ``` r
 # install.packages("devtools")
@@ -43,7 +43,7 @@ if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("VariantAnnotation")
-devtools::install_github("balr411/externalCov")
+devtools::install_github("balr411/RVcov")
 ```
 
 Instructions on how to install tabix (from SAMtools) and BCFtools can be found at the following link:
