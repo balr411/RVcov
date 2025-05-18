@@ -10,7 +10,7 @@ to serve as an external reference panel. The agg_test() function will estimate
 the covariance of the score statistics using the VCF from the external reference 
 panel and can perform various rare-variant aggregation tests using this estimated 
 covariance. Options to supply either VEP annotation files or user-made RAREMETAL 
-formatted group files. Option also to perform the two-stage approach whereby covariance
+formatted group files. Option also to perform the two-stage method whereby covariance
 is estimated only when using the null covariance gives a -log10(p-value) above some 
 threshold (default to 3). 
 

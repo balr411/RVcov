@@ -39,7 +39,7 @@ same format as in the VCF, which in this case is chr2.
 At least one of **burden**, **wburden**, or **SKAT** to be set to TRUE. By default 
 **burden** is TRUE and the other 2 are FALSE. 
 
-**two_stage**: Whether or not to perform the two-stage approach. Defaults to FALSE. 
+**two_stage**: Whether or not to perform the two-stage method. Defaults to FALSE. 
 If TRUE, we need to also specify **two_stage_threshold**, which is by default set
 to 3. 
 
@@ -92,7 +92,7 @@ as well as SKAT:
 burden <- wburden <- SKAT <- TRUE
 ```
 
-Let us also perform the two stage approach with the default threshold of 3:
+Let us also perform the two stage method with the default threshold of 3:
 
 ```{r}
 two_stage <- TRUE
@@ -297,7 +297,7 @@ A second option to using *agg_test()* is to supply a vector of strings containin
 the file names of already created group files. Since *agg_test()* needs to write 
 the group files before calling RAREMETAL, we can use the three masks created above
 to show this. Let us use the African reference panel again, and skip using the 
-two-stage approach. We set pLOF, pLOF_narrowMissense, and pLOF_broadMissense all 
+two-stage method. We set pLOF, pLOF_narrowMissense, and pLOF_broadMissense all 
 to FALSE. If desired, they could be left to TRUE, and RAREMETAL will be run for
 those 3 mask definitions as well as the user-supplied group files (which in this 
 case are the same, and hence each test would be performed twice).

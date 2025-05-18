@@ -1,6 +1,6 @@
-#' @title Perform two-stage approach for rare-variant aggregation testing
+#' @title Perform two-stage method for rare-variant aggregation testing
 #'
-#' @description A function that performs the two-stage approach for rare-variant
+#' @description A function that performs the two-stage method for rare-variant
 #' aggregation testing.
 #'
 #' @param mask_list A list where each element is a 1 column data frame of variants
@@ -10,7 +10,7 @@
 #' "REF", "ALT", "AF", "AC", "PVAL"
 #'
 #' @param two_stage_threshold -log10(p-value) threshold to use for two-stage
-#' approach. Default = 3.
+#' method. Default = 3.
 #'
 #' @param burden Perform simple (unweighted) burden test? Must be TRUE or FALSE.
 #'
@@ -38,7 +38,7 @@ two_stage_test <- function(mask_list, allele_freq_test, two_stage_threshold = 3,
   allele_freq_test$SNP <- paste(allele_freq_test$CHROM, allele_freq_test$POS,
                                 allele_freq_test$REF, allele_freq_test$ALT, sep = ":")
 
-  #Loop over group files to perform two-stage approach
+  #Loop over group files to perform two-stage method
   to_return <- FALSE
   i <- 1
   num_masks <- length(mask_list)

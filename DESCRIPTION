@@ -7,7 +7,7 @@ Maintainer: Brady Ryan <balr@umich.edu>
 Description: Package that estimates single-variant score statistic covariance 
   using a VCF from an external reference panel, and calls RAREMETAL to perform 
   rare-variant aggregation testing. Package is also able to perform our two-stage 
-  approach of first performing the rare-variant aggregation test using the null
+  method of first performing the rare-variant aggregation test using the null
   covariance, and repeating it only if the -log10(p-value) is above some threshold.
 License: MIT
 Encoding: UTF-8

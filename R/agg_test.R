@@ -4,7 +4,7 @@
 #'  given a path to a RAREMETALWORKER formatted score statistic file, a path to
 #'  a VCF containing the individual-level genetic data of the individuals to be
 #'  used as the external reference panel, and the path to a gzipped VEP
-#'  annotation file. Option to use the two-stage approach where external
+#'  annotation file. Option to use the two-stage method where external
 #'  reference panel is used only when the -log10(p-value) using the null
 #'  covariance is above some threshold.
 #'
@@ -42,7 +42,7 @@
 #'  the null covariance is above some threshold? Default = FALSE.
 #'
 #' @param two_stage_threshold What -log10(p-value) threshold would you like to
-#'  use for two-stage approach? Default = 3.
+#'  use for two-stage method? Default = 3.
 #'
 #' @param group_file Vector of strings containing the file paths and names of
 #'  the group files to perform the rare-variant aggregation tests with. If not
@@ -100,7 +100,7 @@
 #' @export agg_test
 #'
 #' @return 1 if RAREMETAL was performed using the estimated covariance successfully,
-#' 0 if two-stage approach was performed successfully but covariance did not need
+#' 0 if two-stage method was performed successfully but covariance did not need
 #' to be computed.
 #'
 #' @examples #Use examples of data that I simulate (Note this will cause devtool::check() issue)
@@ -172,7 +172,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
 
   #Get group files
   #Return them as a list of data frames in addition to writing the group file to
-  #make it easier to perform the two-stage approach
+  #make it easier to perform the two-stage method
   if(pLOF | pLOF_narrowMissense | pLOF_broadMissense){
     if(is.null(anno_file) & is.null(anno)){
       stop("Did not give annotation file or path to annotation file needed
@@ -217,7 +217,7 @@ agg_test <- function(score_stat_file, vcf_file, chr, burden = TRUE, wburden = FA
 
   }
 
-  #Perform two-stage approach if desired
+  #Perform two-stage method if desired
   if(two_stage){
     calculate_covariance <- two_stage_test(mask_list, allele_freq_test,
                                            two_stage_threshold, burden, wburden,
